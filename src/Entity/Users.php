@@ -32,6 +32,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
+    #[ORM\Column]
+    private ?bool $is_verified = false;
+
+    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -110,6 +115,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getIsVerified(): ?bool
+    {
+        return $this->is_verified;
+    }
+
+    public function setIsVerified(bool $is_verified): self
+    {
+        $this->is_verified = $is_verified;
 
         return $this;
     }

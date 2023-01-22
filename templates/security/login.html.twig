@@ -4,7 +4,7 @@
 
 {% block body %}
 <section class="container my-3">
-    <div class="dow">
+    <div class="row">
         <div class="col">
             <form method="post">
                 {% if error %}
@@ -40,8 +40,11 @@
             
                 <button class="btn btn-lg btn-primary mt-3" type="submit">
                     Me connecter
-                </button>
-                <a href="{{path('app_register')}}" class="btn btn-secondary mt-3">Je n'ai pas encore de compte : m'inscrire</a>
+                </button><br>
+                Je n'ai pas encore de compte :
+                <a href="{{path('app_register')}}" class=" mt-3">M'inscrire</a><br>
+                <a href="{{path('forgotten_password')}}" class=" mt-3">Mot de passe oublié</a> <br>
+                
             </form>
         </div>
     </div>

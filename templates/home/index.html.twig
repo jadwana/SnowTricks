@@ -18,12 +18,15 @@
             <div class="card" style="width: 18rem;">
               <img src="{{asset('assets/pictures/indy.jpg')}}" class="card-img-top" alt="{{trick.name}}">
               <div class="card-body">
+                
                 <div class="row">
                   <div class="col"><a href="#"><h5 class="card-title">{{trick.name}}</h5></a></div>
+                  {% if app.user and app.user.isVerified %}
                   <div class="col">
                     <a href="#" class="stretched-link"><i class="fa fa-edit"></i></a>
                     <a href="#" class="stretched-link"><i class="fa fa-trash-alt"></i></a>
                   </div>
+                  {% endif %}
                 </div>
                 
                 <div class="mb-1 text-muted">{{trick.createdAt|date('d/m/Y à H:i:s')}}</div>

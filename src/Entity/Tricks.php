@@ -36,11 +36,16 @@ class Tricks
     private ?Categories $category = null;
 
     #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Medias::class)]
-    private Collection $media;
+    private Collection $medias;
+
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comments::class)]
+    private Collection $comments;
 
     public function __construct()
     {
-        $this->media = new ArrayCollection();
+        $this->medias = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -123,27 +128,57 @@ class Tricks
     /**
      * @return Collection<int, Medias>
      */
-    public function getMedia(): Collection
+    public function getMedias(): Collection
     {
-        return $this->media;
+        return $this->medias;
     }
 
-    public function addMedium(Medias $medium): self
+    public function addMedias(Medias $medias): self
     {
-        if (!$this->media->contains($medium)) {
-            $this->media->add($medium);
-            $medium->setTricks($this);
+        if (!$this->medias->contains($medias)) {
+            $this->medias->add($medias);
+            $medias->setTricks($this);
         }
 
         return $this;
     }
 
-    public function removeMedium(Medias $medium): self
+    public function removeMedias(Medias $medias): self
     {
-        if ($this->media->removeElement($medium)) {
+        if ($this->medias->removeElement($medias)) {
             // set the owning side to null (unless already changed)
-            if ($medium->getTricks() === $this) {
-                $medium->setTricks(null);
+            if ($medias->getTricks() === $this) {
+                $medias->setTricks(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comments>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comments $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setTrick($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comments $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getTrick() === $this) {
+                $comment->setTrick(null);
             }
         }
 

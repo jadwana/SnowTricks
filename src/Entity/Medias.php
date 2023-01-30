@@ -19,8 +19,11 @@ class Medias
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
-    #[ORM\ManyToOne(inversedBy: 'media')]
+    #[ORM\ManyToOne(inversedBy: 'medias')]
     private ?Tricks $tricks = null;
+
+    #[ORM\Column]
+    private ?bool $main = null;
 
     public function getId(): ?int
     {
@@ -59,6 +62,18 @@ class Medias
     public function setTricks(?Tricks $tricks): self
     {
         $this->tricks = $tricks;
+
+        return $this;
+    }
+
+    public function isMain(): ?bool
+    {
+        return $this->main;
+    }
+
+    public function setMain(bool $main): self
+    {
+        $this->main = $main;
 
         return $this;
     }

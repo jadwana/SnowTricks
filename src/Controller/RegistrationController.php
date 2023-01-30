@@ -20,7 +20,15 @@ use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
 class RegistrationController extends AbstractController
 {
     #[Route('/inscription', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, SendMailService $mail, JWTService $jwt, UserAuthenticatorInterface $userAuthenticator, UsersAuthenticator $authenticator): Response
+    public function register(
+        Request $request, 
+        UserPasswordHasherInterface $userPasswordHasher, 
+        EntityManagerInterface $entityManager, 
+        SendMailService $mail, 
+        JWTService $jwt, 
+        UserAuthenticatorInterface $userAuthenticator, 
+        UsersAuthenticator $authenticator
+        ): Response
     {
         $user = new Users();
         $form = $this->createForm(RegistrationFormType::class, $user);

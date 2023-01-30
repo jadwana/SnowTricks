@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{ trick.name }} {% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="card" >
+        {% set chemin = 'defaut.svg' %}
+              {% for media in trick.medias %}
+                  {% if media.type == 'picture' and  media.main == true %}
+                    {% set chemin = media.path %}
+                    {% elseif chemin == 'defaut.svg' %}
+                      {% set chemin = media.path %}
+                      {% if media.type == 'picture' and  media.main == true %}
+                        {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
+                        {% set chemin = media.path %}
+                      {% endif %}
+                    {% endif %}
+              {% endfor %} 
+              <img src=" {{asset('assets/pictures/') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
+        <div class="card-body text-center">
+        <h5 class="card-title">{{ trick.name}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">Ajouté le : {{ trick.createdAt|date('d/m/Y à H:i')}}</h6>
+        {% if trick.updatedAt is not null %}
+        <h6 class="card-subtitle mb-2 text-muted">Modifié le : {{ trick.updatedAt|date('d/m/Y à H:i')}}</h6>
+        {% endif %}
+        <p class="card-text"> {{trick.category.name}} </p>
+        <hr>
+        <p class="card-text">{{ trick.description}}</p>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-6">
+            {% for media in trick.medias %}
+                {% if media.type == 'picture' %}
+                    <img src=" {{asset('assets/pictures/') ~ media.path }} " alt="{{trick.name}}">
+                {% endif %}
+                {% if media.type == 'video' %}
+                    <div class="ratio ratio-16x9 mt-3">
+                        <iframe allowfullsreen src="{{ media.path }}" frameborder="0"></iframe>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <h3>Commentaires :</h3>
+    <div class="row mt-3">
+        <div class="col-6">
+            {% for comment in trick.comments %}
+            <p> {{comment.content}} </p>
+            <p>Créé le : {{comment.createdAt|date('d/m/Y à H:i')}} </p>
+            <p>Par : {{comment.author.username}}</p>
+            {% if comment.author.avatar is null %}
+                <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
+                {% else %}
+                    <img src=" {{asset('assets/pictures/') ~ comment.author.avatar }} " alt="{{trick.name}}">
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <h3>ajouter un commentaire</h3>
+    {% if form is defined %}
+    {{ form_start(form) }}
+    {{ form_row(form.content) }}
+    <button type="submit" class="btn btn-primary my-3">Ajouter un commentaire</button>
+    
+    {{ form_end(form) }}
+    {% endif %}
+    
+    
+</div>
+
+
+
+
+{% endblock %}

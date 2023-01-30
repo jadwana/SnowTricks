@@ -5,36 +5,55 @@
 
 {% block body %}
 <main class="container">
-    <div class="mb-4 py-5 text-center bg-dark text-white">
-      <div >
+  <div class="my-4 py-5 text-center " style="background: center/cover url('assets/pictures/main.jpg') ; height: 48rem">
+    <h1 class="container " id="banner">
+      Partager vos tricks avec la communauté
+    </h1>
         
-        <h1>Partager vos tricks avec la communauté</h1>
-      </div>
-    </div>
+  </div>
     
-    <div class="row mb-2">
-      {% for trick in tricks %}
-          <div class="col-md-6">
-            <div class="card" style="width: 18rem;">
-              <img src="{{asset('assets/pictures/indy.jpg')}}" class="card-img-top" alt="{{trick.name}}">
-              <div class="card-body">
+  <div class="row mb-2">
+    {% for trick in tricks %}
+        <div class="col-md-6">
+          <div class="card" style="width: 18rem;">
+            {% set chemin = 'defaut.svg' %}
+              {% for media in trick.medias %}
                 
+                  {% if media.type == 'picture' and  media.main == true %}
+                    {% set chemin = media.path %}
+                    {% elseif chemin == 'defaut.svg' %}
+                      {% set chemin = media.path %}
+                      {% if media.type == 'picture' and  media.main == true %}
+                        {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
+                        {% set chemin = media.path %}
+                      {% endif %}
+                    {% endif %}
+              {% endfor %} 
+
+              <img src=" {{asset('assets/pictures/') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
+
+              <div class="card-body">
                 <div class="row">
-                  <div class="col"><a href="#"><h5 class="card-title">{{trick.name}}</h5></a></div>
+                  <div class="col-6"><a href="{{ path('app_trick', {'slug' : trick.slug})}}"><h5 class="card-title">{{trick.name}}</h5></a></div>
+                  
+                </div>
+               
+                <div class="mb-1 text-muted">{{trick.createdAt|date('d/m/Y à H:i')}}</div>
+
+                <div class="row">
                   {% if app.user and app.user.isVerified %}
-                  <div class="col">
-                    <a href="#" class="stretched-link"><i class="fa fa-edit"></i></a>
-                    <a href="#" class="stretched-link"><i class="fa fa-trash-alt"></i></a>
-                  </div>
+                  
+                    <a href="#" ><i class="fa fa-edit"></i></a>
+                    <a href="#" ><i class="fa fa-trash-alt"></i></a>
+                  
                   {% endif %}
                 </div>
-                
-                <div class="mb-1 text-muted">{{trick.createdAt|date('d/m/Y à H:i:s')}}</div>
               </div>
             </div>
           </div>
-        {% endfor %}
-    </div>
+        </div>
+      {% endfor %}
+  </div>
     
         
 </main>

@@ -61,11 +61,11 @@ class SecurityController extends AbstractController
 
             //on verifie si on a un utilisateur
             if($user){
-                if(!$user->getIsVerified()){
-                //le compte de l'utilisateur n'est pas vérifié
-                $this->addFlash('danger', 'Vous devez valider votre compte avant de pouvoir modifier votre mot de passe');
-                return $this->redirectToRoute('app_login');
-                }
+                // if(!$user->getIsVerified()){
+                // //le compte de l'utilisateur n'est pas vérifié
+                // $this->addFlash('danger', 'Vous devez valider votre compte avant de pouvoir modifier votre mot de passe');
+                // return $this->redirectToRoute('app_login');
+                // }
              // on génère un token de réinitialisation
              $token = $tokenGeneratorInterface->generateToken();
              $user->setResetToken($token);

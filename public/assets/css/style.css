@@ -3,3 +3,15 @@
     font-size: 90px;
     font-weight: bolder;
 }
+
+li * {
+    display:inline-block;
+    margin:0 10px;
+    
+}
+ul *{
+    list-style-type:none;
+    padding: 0;
+    margin: 0;
+    
+  }

@@ -11,7 +11,11 @@
     </h1>
         
   </div>
-    
+  <hr>
+  <div class="row text-center">
+    <a href="{{path('add_trick')}}">Ajouter une figure</a>
+  </div>
+    <hr>
   <div class="row mb-2">
     {% for trick in tricks %}
         <div class="col-md-6">
@@ -22,7 +26,6 @@
                   {% if media.type == 'picture' and  media.main == true %}
                     {% set chemin = media.path %}
                     {% elseif chemin == 'defaut.svg' %}
-                      {% set chemin = media.path %}
                       {% if media.type == 'picture' and  media.main == true %}
                         {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
                         {% set chemin = media.path %}
@@ -30,7 +33,7 @@
                     {% endif %}
               {% endfor %} 
 
-              <img src=" {{asset('assets/pictures/') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
+              <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
 
               <div class="card-body">
                 <div class="row">
@@ -43,8 +46,8 @@
                 <div class="row">
                   {% if app.user and app.user.isVerified %}
                   
-                    <a href="#" ><i class="fa fa-edit"></i></a>
-                    <a href="#" ><i class="fa fa-trash-alt"></i></a>
+                    <a href=" {{path('edit_trick', {'id' : trick.id})}} " ><i class="fa fa-edit"></i></a>
+                    <a href="{{path('delete_trick', {'id' : trick.id})}}" ><i class="fa fa-trash-alt"></i></a>
                   
                   {% endif %}
                 </div>

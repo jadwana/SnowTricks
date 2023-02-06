@@ -2,13 +2,17 @@
 
 namespace App\Entity;
 
-use App\Repository\TricksRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\TricksRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TricksRepository::class)]
+#[UniqueEntity(fields: ['name'], message: 'Il existe déjà un trick avec ce nom')]
+
 class Tricks
 {
     #[ORM\Id]
@@ -16,7 +20,8 @@ class Tricks
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique : true)]
+    #[Assert\NotBlank(message: 'Le titre de la figure ne peut pas être vide')]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -35,7 +40,7 @@ class Tricks
     #[ORM\JoinColumn(nullable: false)]
     private ?Categories $category = null;
 
-    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Medias::class)]
+    #[ORM\OneToMany(mappedBy: 'tricks', targetEntity: Medias::class, cascade: ['persist'])]
     private Collection $medias;
 
     #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comments::class)]

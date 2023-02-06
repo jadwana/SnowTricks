@@ -11,14 +11,13 @@
                   {% if media.type == 'picture' and  media.main == true %}
                     {% set chemin = media.path %}
                     {% elseif chemin == 'defaut.svg' %}
-                      {% set chemin = media.path %}
                       {% if media.type == 'picture' and  media.main == true %}
                         {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
                         {% set chemin = media.path %}
                       {% endif %}
                     {% endif %}
               {% endfor %} 
-              <img src=" {{asset('assets/pictures/') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
+              <img src=" {{asset('assets/uploads/tricks/') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
         <div class="card-body text-center">
         <h5 class="card-title">{{ trick.name}}</h5>
         <h6 class="card-subtitle mb-2 text-muted">Ajouté le : {{ trick.createdAt|date('d/m/Y à H:i')}}</h6>
@@ -35,7 +34,7 @@
         <div class="col-6">
             {% for media in trick.medias %}
                 {% if media.type == 'picture' %}
-                    <img src=" {{asset('assets/pictures/') ~ media.path }} " alt="{{trick.name}}">
+                    <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ media.path }} " alt="{{trick.name}}">
                 {% endif %}
                 {% if media.type == 'video' %}
                     <div class="ratio ratio-16x9 mt-3">
@@ -50,14 +49,18 @@
     <div class="row mt-3">
         <div class="col-6">
             {% for comment in trick.comments %}
-            <p> {{comment.content}} </p>
-            <p>Créé le : {{comment.createdAt|date('d/m/Y à H:i')}} </p>
-            <p>Par : {{comment.author.username}}</p>
-            {% if comment.author.avatar is null %}
-                <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
-                {% else %}
-                    <img src=" {{asset('assets/pictures/') ~ comment.author.avatar }} " alt="{{trick.name}}">
-            {% endif %}
+            <div class="row border border-primary mb-3">
+                <div class="col-3">
+                    {% if comment.author.avatar is null %}
+                        <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
+                    {% else %}
+                        <img src=" {{asset('assets/pictures/') ~ comment.author.avatar }} " alt="{{trick.name}}">
+                     {% endif %}
+                </div>
+                <div class="col-3">Créé le : {{comment.createdAt|date('d/m/Y à H:i')}} Par : {{comment.author.username}}</div>
+                <div class="col-6">{{comment.content}}</div>
+            </div>
+            
             {% endfor %}
         </div>
     </div>
@@ -65,7 +68,7 @@
     <h3>ajouter un commentaire</h3>
     {% if form is defined %}
     {{ form_start(form) }}
-    {{ form_row(form.content) }}
+    {{ form_widget(form.content) }}
     <button type="submit" class="btn btn-primary my-3">Ajouter un commentaire</button>
     
     {{ form_end(form) }}

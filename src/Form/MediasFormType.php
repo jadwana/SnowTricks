@@ -2,11 +2,13 @@
 
 namespace App\Form;
 
+
 use App\Entity\Medias;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class MediasFormType extends AbstractType
 {
@@ -21,6 +23,10 @@ class MediasFormType extends AbstractType
             ])
             ->add('type', HiddenType::class, [
                 'data' => 'video',
+            ])
+
+            ->add('main', CheckboxType::class, [
+                
             ])
             
         ;

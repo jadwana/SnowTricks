@@ -23,10 +23,10 @@
             {% set chemin = 'defaut.svg' %}
               {% for media in trick.medias %}
                 
-                  {% if media.type == 'picture' and  media.main == true %}
+                  {% if  media.main == true %}
                     {% set chemin = media.path %}
                     {% elseif chemin == 'defaut.svg' %}
-                      {% if media.type == 'picture' and  media.main == true %}
+                      {% if  media.main == true %}
                         {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
                         {% set chemin = media.path %}
                       {% endif %}
@@ -47,7 +47,7 @@
                   {% if app.user and app.user.isVerified %}
                   
                     <a href=" {{path('edit_trick', {'id' : trick.id})}} " ><i class="fa fa-edit"></i></a>
-                    <a href="{{path('delete_trick', {'id' : trick.id})}}" ><i class="fa fa-trash-alt"></i></a>
+                    <a href="{{path('delete_trick', {'id' : trick.id})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt"></i></a>
                   
                   {% endif %}
                 </div>

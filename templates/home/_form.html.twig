@@ -9,49 +9,54 @@
     {% if app.request.attributes.get('_route') == 'edit_trick' %}
         <h2>Images</h2>
         {% for media in trick.medias %}
-            {% if media.type == 'picture'%}
                 <div>
                     <img src=" {{asset('assets/uploads/tricks/mini/300x300-' ~ media.path)}} " alt="image" width="150">
-                    <a href=" {{path('delete_image', {id: media.id})}} " data-delete data-token="{{csrf_token('delete' ~ media.id )}}" >Supprimer</a>
+                    <a href=" {{path('delete_image', {id: media.id})}} " data-delete data-token="{{csrf_token('delete' ~ media.id )}}" ><i class="fa-solid fa-trash-can"></i></a>
+                    {% if media.main == true %}
+                        image à la une <i class="fa-solid fa-heart"></i>
+                        {% else %}
+                        passer en image pple : 
+                        <a href=" {{path('main_picture', {id: media.id})}} " ><i class="fa-solid fa-rotate"></i></a>
+                    {% endif %}
                 </div>
-                {% else %} pas d'image 
-            {% endif %}
         {% endfor %}
         <h2>Videos</h2>
-        {% for media in trick.medias %}
-            {% if media.type == 'video'%}
+        {% for video in trick.videos %}
                 <div>
                     <div class="ratio ratio-16x9 mt-3">
-                        <iframe allowfullsreen src="{{ media.path }}" frameborder="0" ></iframe>
+                        <iframe allowfullsreen src="{{ video.link }}" frameborder="0" ></iframe>
                     </div>
-                    {# <form action="{{ url('delete_video', { id: media.id }) }}" method="post">
-                        <input type="hidden" name="token" value="{{ csrf_token('delete-item') }}"/>
                     
-                        <button type="submit">Delete item</button>
-                    </form> #}
-
-                    <a href=" {{path('delete_video', {id: media.id})}}">Supprimer</a>
+                      <a href="{{path('delete_video', { id: video.id })}}" data-delete data-token="{{csrf_token('delete' ~ video.id )}}"><i class="fa-solid fa-trash-can"></i></a>  
                 </div> 
-                {% else %} pas de video
-            {% endif %}
         {% endfor %}
     {% endif %}
 
     {{form_row(form.images)}}
-    <button type="button" class="btn btn-primary add_video_link" data-collection-holder-class="medias">ajouter une video</button>
+    Ajouter une video
+    <button type="button" class="btn btn-primary add_video_link" data-collection-holder-class="videos"><i class="fa-solid fa-square-plus"></i></button>
     <div class="form">
-        <ul class="medias"
-    data-index="{{ form.medias|length > 0 ? form.medias|last.vars.name + 1 : 0 }}"
-    data-prototype="{{ form_row(form.medias.vars.prototype)|e('html_attr') }}"
+        <ul class="videos"
+    data-index="{{ form.videos|length > 0 ? form.videos|last.vars.name + 1 : 0 }}"
+    data-prototype="{{ form_row(form.videos.vars.prototype)|e('html_attr') }}" #}
     >
    
     </ul>
     
     </div>
-    
+
+    {# <div class="d-none"> #}
+        {{form_row(form.videos)}}
+    {# </div> #}
+ 
+   
 
     <button type="submit" class="btn btn-primary"> {{button_label|default('Ajouter')}} </button>
-{{form_end(form)}}
+    {% if app.request.attributes.get('_route') == 'edit_trick' %}
+    
+    <a href="{{path('delete_trick', {'id' : trick.id})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" class="btn btn-primary">Supprimer</a>
+    {% endif %}
+    {{form_end(form)}}
 
 
 

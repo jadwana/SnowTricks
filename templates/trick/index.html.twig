@@ -8,10 +8,10 @@
     <div class="card" >
         {% set chemin = 'defaut.svg' %}
               {% for media in trick.medias %}
-                  {% if media.type == 'picture' and  media.main == true %}
+                  {% if media.main == true %}
                     {% set chemin = media.path %}
                     {% elseif chemin == 'defaut.svg' %}
-                      {% if media.type == 'picture' and  media.main == true %}
+                      {% if media.main == true %}
                         {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
                         {% set chemin = media.path %}
                       {% endif %}
@@ -33,14 +33,19 @@
     <div class="row mt-3">
         <div class="col-6">
             {% for media in trick.medias %}
-                {% if media.type == 'picture' %}
+                
                     <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ media.path }} " alt="{{trick.name}}">
-                {% endif %}
-                {% if media.type == 'video' %}
-                    <div class="ratio ratio-16x9 mt-3">
-                        <iframe allowfullsreen src="{{ media.path }}" frameborder="0"></iframe>
-                    </div>
-                {% endif %}
+                
+                
+                    
+                
+            {% endfor %}
+        </div>
+        <div>
+            {% for video in trick.videos %}
+            <div class="ratio ratio-16x9 mt-3">
+                <iframe allowfullsreen src="{{ video.link }}" frameborder="0"></iframe>
+            </div>
             {% endfor %}
         </div>
     </div>

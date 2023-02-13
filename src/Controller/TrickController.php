@@ -2,20 +2,25 @@
 
 namespace App\Controller;
 
-use App\Entity\Tricks;
-use App\Entity\Comments;
 use App\Entity\Medias;
+use App\Entity\Tricks;
+use App\Entity\Videos;
+use App\Entity\Comments;
 use App\Form\CommentFormType;
 use App\Form\AddTrickFormType;
 use App\Service\PictureService;
 use App\Repository\TricksRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 
 class TrickController extends AbstractController
 {
@@ -66,13 +71,11 @@ class TrickController extends AbstractController
 
 
             }
-
+            
             //on récupère les videos
-            foreach($trick->getMedias() as $media){
-                $media->setMain(0);
-                $media->setTricks($trick);
+            foreach($trick->getVideos() as $video){
+                $video->setTricks($trick);
             }
-           
 
             // on génère le slug
             $slug = $slugger->slug($trick->getName());
@@ -93,11 +96,33 @@ class TrickController extends AbstractController
         ]);
     }
 
+    #[Route('/image-principale/{id}', name: 'main_picture')]
+    public function mainPicture(Medias $medias, EntityManagerInterface $entityManager)
+    {
+        $params = ['id' =>$medias->getTricks()->getId()];
+        $trickmedias = $medias->getTricks()->getMedias();
+        foreach($trickmedias as $media){
+            $media->setMain(0);
+        }
+
+        $medias->setMain(1);
+        $entityManager->persist($medias);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('edit_trick', $params);
+    }
+
     #[Route('/suppression-figure/{id}', name: 'delete_trick')]
-    public function delete(Tricks $trick, EntityManagerInterface $entityManager): Response
+    public function delete(Tricks $trick, EntityManagerInterface $entityManager, PictureService $pictureService): Response
     {
         //on verifie si l'utilisateur peut supprimer  avec le voter
         $this->denyAccessUnlessGranted('TRICK_DELETE', $trick);
+
+        foreach ($trick->getMedias() as $media){
+            $name = $media->getPath();
+            $pictureService->delete($name, 'tricks', 300, 300);
+        }
+
         $entityManager->remove($trick);
         $entityManager->flush();
 
@@ -105,24 +130,29 @@ class TrickController extends AbstractController
     }
 
     #[Route('/suppression-video/{id}', name: 'delete_video')]
+    // #[Security("is_granted('ROLE_USER')")]
 
-    public function deleteVideo(Medias $media, EntityManagerInterface $entityManager, Request $request): Response
+    public function deleteVideo(Videos $videos, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenmanager): JsonResponse
     {
-        $params = ['id' =>$media->getTricks()->getId()];
-        // $submittedToken = $request->request->get('token');
-   
-        // if($this->isCsrfTokenValid('delete-item', $submittedToken)){
-            $entityManager->remove($media);
+        
+
+        // on récupère le contenu de la requete
+        $data = json_decode($request->getContent(), true);
+
+        // on vérifie le token
+        if($this->isCsrfTokenValid('delete' .$videos->getId(), $data['_token'])){
+            // le token csrf est valide
+            $entityManager->remove($videos);
             $entityManager->flush();
 
-            return $this->redirectToRoute('edit_trick', $params);
-        // }
-        
-        
-        // return $this->redirectToRoute('edit_trick', $params);
+            return new JsonResponse(['success' => true], 200);
+            }
+
+        return new JsonResponse(['error' => 'Token invalide'], 400);
     }
 
     #[Route('/suppression-image/{id}', name: 'delete_image', methods:['DELETE'])]
+
     public function deleteImage(
         Medias $media, Request $request, EntityManagerInterface $entityManagerInterface, 
         PictureService $pictureService): JsonResponse
@@ -143,7 +173,7 @@ class TrickController extends AbstractController
 
                 return new JsonResponse(['success' => true], 200);
             }
-            // la suppression n'a pas focntionné
+            // la suppression n'a pas focntionnée
             return new JsonResponse(['error' => 'erreur de suppression']);
         }
 
@@ -186,11 +216,13 @@ class TrickController extends AbstractController
 
             }
 
-            //on récupère les videos
-            foreach($trick->getMedias() as $media){
-                $media->setMain(0);
-                $media->setTricks($trick);
+            //on ajoute les videos
+            foreach($trick->getVideos() as $video){
+               
+                $video->setTricks($trick);
             }
+
+            
 
             // on génère le slug
             $slug = $slugger->slug($trick->getName());
@@ -216,6 +248,7 @@ class TrickController extends AbstractController
     }
 
     #[Route('/{slug}', name: 'app_trick')]
+    // #[Security("is_granted('ROLE_USER')")]
     public function index(Tricks $tricks, Request $request, EntityManagerInterface $entityManager): Response
     {
        

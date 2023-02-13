@@ -5,15 +5,19 @@ namespace App\Form;
 use App\Entity\Tricks;
 use App\Entity\Categories;
 use App\Form\MediasFormType;
+use App\Form\VideosFormType;
 use App\Repository\CategoriesRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\All;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Validator\Constraints\All;
-use Symfony\Component\Validator\Constraints\Image;
 
 class AddTrickFormType extends AbstractType
 {
@@ -50,13 +54,19 @@ class AddTrickFormType extends AbstractType
                 ]
             ])
 
-            
+            // ->add('video', TextType::class, [
+            //     'label' => 'ajout video',
+            //     'mapped' =>false,
+            //     'required' =>false,
+                
+            // ])
 
-            ->add('medias', CollectionType::class, [
-                'entry_type' => MediasFormType::class,
+            ->add('videos', CollectionType::class, [
+                'entry_type' => VideosFormType::class,
                 'entry_options' => ['label' => false],
                 'label' => false,
                 'allow_add' => true,
+                'allow_delete' =>true
                 
                 
             ])

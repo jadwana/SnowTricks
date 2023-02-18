@@ -6,6 +6,7 @@ use App\Entity\Users;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -31,19 +32,19 @@ class RegistrationFormType extends AbstractType
                 ],
                 'label' => 'Email'
             ])
-            ->add('rgpd', CheckboxType::class, [
-                'mapped' => false,
-                'constraints' => [
-                    new IsTrue([
-                        'message' => 'Vous devez accepter les termes pour pouvoir vous inscrire',
-                    ]),
-                ],
-                'label' => 'Merci d\'accepter les termes relatifs au RPD en cochant la case ci-dessous :',
-                'attr' => [
-                    'class' => 'form-check'
-                ],
+            // ->add('rgpd', CheckboxType::class, [
+            //     'mapped' => false,
+            //     'constraints' => [
+            //         new IsTrue([
+            //             'message' => 'Vous devez accepter les termes pour pouvoir vous inscrire',
+            //         ]),
+            //     ],
+            //     'label' => 'Merci d\'accepter les termes relatifs au RPD en cochant la case ci-dessous :',
+            //     'attr' => [
+            //         'class' => 'form-check'
+            //     ],
                 
-            ])
+            // ])
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
@@ -64,6 +65,11 @@ class RegistrationFormType extends AbstractType
                     ]),
                 ],
                 'label' => 'Mot de passe'
+            ])
+
+            ->add('avatar', FileType::class, [
+                'label' => 'Ajouter une image d\'avatar',
+                'required' => false,
             ])
         ;
     }

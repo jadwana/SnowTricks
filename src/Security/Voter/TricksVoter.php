@@ -3,6 +3,8 @@
 namespace App\Security\Voter;
 
 use App\Entity\Tricks;
+use Exception;
+use phpDocumentor\Reflection\PseudoTypes\False_;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -39,15 +41,17 @@ class TricksVoter extends Voter
     {
         // on récupère l'utilisateur à partir du token
         $user = $token->getUser();
+        //on vérifie que le compte a été validé
+        if(!$user->getIsVerified()) return False;
 
         //on vérife que l'utilisateur est bien une instance de userinterface
         if(!$user instanceof UserInterface) return false;
         
-
         // on vérifie si l'utilisateur est admin
         if(!$this->security->isGranted('ROLE_ADMIN')) return TRUE;
 
-        // si uilisateur pas admin on verifie les permissions
+        
+        // si utilisateur pas admin on verifie les permissions
         switch($attribute){
             case self::EDIT:
                 // On vérifie si l'utilisateur peut éditer
@@ -61,6 +65,8 @@ class TricksVoter extends Voter
     }
 
     private function canEdit(){
+
+       
         return $this->security->isGranted('ROLE_USER');
     }
     private function canDelete(){

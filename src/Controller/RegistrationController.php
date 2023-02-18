@@ -8,6 +8,7 @@ use App\Service\SendMailService;
 use App\Form\RegistrationFormType;
 use App\Repository\UsersRepository;
 use App\Security\UsersAuthenticator;
+use App\Service\PictureService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +28,8 @@ class RegistrationController extends AbstractController
         SendMailService $mail, 
         JWTService $jwt, 
         UserAuthenticatorInterface $userAuthenticator, 
-        UsersAuthenticator $authenticator
+        UsersAuthenticator $authenticator,
+        PictureService $pictureService
         ): Response
     {
         $user = new Users();
@@ -43,6 +45,20 @@ class RegistrationController extends AbstractController
                 )
             );
 
+            //on recupère l'image de l'avatar
+            $avatar = $form->get('avatar')->getData();
+            // if($avatar){
+            //     $nomAvatar = pathinfo($avatar->getClientOriginalName(), PATHINFO_FILENAME);
+            //     $nomAvatar = $nomAvatar.'.'.$avatar->guessExtension();
+            //     dd($nomAvatar);
+            // }
+           
+            //on définie le dossier de destination
+            $folder = 'avatars';
+            // on appelle le service d'ajout
+            $fichier = $pictureService->add($avatar, $folder, 300, 300);
+            
+            $user->setAvatar($fichier);
             $entityManager->persist($user);
             $entityManager->flush();
             // do anything else you need here, like send an email
@@ -147,6 +163,6 @@ class RegistrationController extends AbstractController
                 compact('user', 'token')
             );
             $this->addFlash('success', 'email de vérification envoyé');
-            return $this->redirectToRoute('profile_index');
+            return $this->redirectToRoute('app_home');
     }
 }

@@ -17,9 +17,16 @@
                       {% endif %}
                     {% endif %}
               {% endfor %} 
-              <img src=" {{asset('assets/uploads/tricks/') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
+              <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ chemin }} " class="card-img-top img-fluid mx-auto" alt="{{trick.name}}">
+              <div class="card-img-overlay"> 
+                {% if app.user and app.user.isVerified %}
+                <a href=" {{path('edit_trick', {'id' : trick.id})}} " ><i class="fa fa-edit"></i></a>
+                <a href="{{path('delete_trick', {'id' : trick.id})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt"></i></a>
+              {% endif %}
+              <h5 class="card-title text-center">{{ trick.name}}</h5>
+              </div>
         <div class="card-body text-center">
-        <h5 class="card-title">{{ trick.name}}</h5>
+        
         <h6 class="card-subtitle mb-2 text-muted">Ajouté le : {{ trick.createdAt|date('d/m/Y à H:i')}}</h6>
         {% if trick.updatedAt is not null %}
         <h6 class="card-subtitle mb-2 text-muted">Modifié le : {{ trick.updatedAt|date('d/m/Y à H:i')}}</h6>
@@ -53,13 +60,14 @@
     <h3>Commentaires :</h3>
     <div class="row mt-3">
         <div class="col-6">
-            {% for comment in trick.comments %}
+            {% set sorted_comments = trick.comments|sort((b, a) => a.createdAt <=> b.createdAt) %}
+            {% for comment in sorted_comments %}
             <div class="row border border-primary mb-3">
                 <div class="col-3">
                     {% if comment.author.avatar is null %}
                         <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
                     {% else %}
-                        <img src=" {{asset('assets/pictures/') ~ comment.author.avatar }} " alt="{{trick.name}}">
+                        <img src=" {{asset('assets/uploads/avatars/mini/300x300-') ~ comment.author.avatar }} " style="max-width: 50px;" alt="{{trick.name}}">
                      {% endif %}
                 </div>
                 <div class="col-3">Créé le : {{comment.createdAt|date('d/m/Y à H:i')}} Par : {{comment.author.username}}</div>

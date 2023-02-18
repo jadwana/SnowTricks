@@ -15,3 +15,8 @@ ul *{
     margin: 0;
     
   }
+
+.card-img-top{
+max-height: 600px;
+max-width: 600px;
+}

@@ -47,11 +47,7 @@ class RegistrationController extends AbstractController
 
             //on recupère l'image de l'avatar
             $avatar = $form->get('avatar')->getData();
-            // if($avatar){
-            //     $nomAvatar = pathinfo($avatar->getClientOriginalName(), PATHINFO_FILENAME);
-            //     $nomAvatar = $nomAvatar.'.'.$avatar->guessExtension();
-            //     dd($nomAvatar);
-            // }
+           
            
             //on définie le dossier de destination
             $folder = 'avatars';
@@ -61,6 +57,7 @@ class RegistrationController extends AbstractController
             $user->setAvatar($fichier);
             $entityManager->persist($user);
             $entityManager->flush();
+            
             // do anything else you need here, like send an email
 
             //on génère le JWT de l'utilisateur

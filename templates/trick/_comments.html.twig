@@ -1,0 +1,24 @@
+<div class="container mx-auto" id="comment-container">
+    <div class="row mt-3">
+        <div class="col-6">
+            {% set sorted_comments = trick.comments|sort((b, a) => a.createdAt <=> b.createdAt) %}
+            {% for comment in sorted_comments %}
+            <div class="row border border-primary mb-3">
+                <div class="col-3">
+                    {% if comment.author.avatar is null %}
+                        <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
+                    {% else %}
+                        <img src=" {{asset('assets/uploads/avatars/mini/300x300-') ~ comment.author.avatar }} " style="max-width: 50px;" alt="{{trick.name}}">
+                    {% endif %}
+                </div>
+                <div class="col-9">
+                    <div class="row">{{comment.author.username}} le {{comment.createdAt|date('d/m/Y à H:i')}}</div>
+                    <div class="row">{{comment.content}}</div>
+                </div>
+            </div>
+            
+            {% endfor %}
+            
+        </div>
+    </div>
+</div>

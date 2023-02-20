@@ -20,13 +20,13 @@
               <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ chemin }} " class="card-img-top img-fluid mx-auto" alt="{{trick.name}}">
               <div class="card-img-overlay"> 
                 {% if app.user and app.user.isVerified %}
-                <a href=" {{path('edit_trick', {'id' : trick.id})}} " ><i class="fa fa-edit"></i></a>
+                <a href=" {{path('edit_trick', {'slug' : trick.slug})}} " ><i class="fa fa-edit"></i></a>
                 <a href="{{path('delete_trick', {'id' : trick.id})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt"></i></a>
               {% endif %}
-              <h5 class="card-title text-center">{{ trick.name}}</h5>
+              
               </div>
         <div class="card-body text-center">
-        
+            <h2 class="card-title text-center">{{ trick.name}}</h2>
         <h6 class="card-subtitle mb-2 text-muted">Ajouté le : {{ trick.createdAt|date('d/m/Y à H:i')}}</h6>
         {% if trick.updatedAt is not null %}
         <h6 class="card-subtitle mb-2 text-muted">Modifié le : {{ trick.updatedAt|date('d/m/Y à H:i')}}</h6>
@@ -43,9 +43,6 @@
                 
                     <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ media.path }} " alt="{{trick.name}}">
                 
-                
-                    
-                
             {% endfor %}
         </div>
         <div>
@@ -57,40 +54,73 @@
         </div>
     </div>
 
-    <h3>Commentaires :</h3>
-    <div class="row mt-3">
-        <div class="col-6">
-            {% set sorted_comments = trick.comments|sort((b, a) => a.createdAt <=> b.createdAt) %}
-            {% for comment in sorted_comments %}
-            <div class="row border border-primary mb-3">
-                <div class="col-3">
-                    {% if comment.author.avatar is null %}
-                        <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
-                    {% else %}
-                        <img src=" {{asset('assets/uploads/avatars/mini/300x300-') ~ comment.author.avatar }} " style="max-width: 50px;" alt="{{trick.name}}">
-                     {% endif %}
-                </div>
-                <div class="col-3">Créé le : {{comment.createdAt|date('d/m/Y à H:i')}} Par : {{comment.author.username}}</div>
-                <div class="col-6">{{comment.content}}</div>
-            </div>
-            
-            {% endfor %}
-        </div>
-    </div>
-
-    <h3>ajouter un commentaire</h3>
+    <h3>Ajouter un commentaire</h3>
     {% if form is defined %}
     {{ form_start(form) }}
     {{ form_widget(form.content) }}
     <button type="submit" class="btn btn-primary my-3">Ajouter un commentaire</button>
-    
     {{ form_end(form) }}
+    {% else %}
+    Vous devez être connecté pour pouvoir ajouter un commentaires
     {% endif %}
+
+    <h3>Commentaires :</h3>
+    <div class="container mx-auto" id="comment-container">
+        <div class="row mt-3">
+            <div class="col-6">
+                {% set sorted_comments = trick.comments|sort((b, a) => a.createdAt <=> b.createdAt) %}
+                {% for comment in sorted_comments|slice(0, 5) %}
+                <div class="row border border-primary mb-3">
+                    <div class="col-3">
+                        {% if comment.author.avatar is null %}
+                            <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
+                        {% else %}
+                            <img src=" {{asset('assets/uploads/avatars/mini/300x300-') ~ comment.author.avatar }} " style="max-width: 50px;" alt="{{trick.name}}">
+                        {% endif %}
+                    </div>
+                    <div class="col-9">
+                        <div class="row">{{comment.author.username}} le {{comment.createdAt|date('d/m/Y à H:i')}}</div>
+                        <div class="row">{{comment.content}}</div>
+                    </div>
+                </div>
+                
+                {% endfor %}
+                {% if sorted_comments|length >5 %}
+                <div class="row load-more">
+                    <button id="load-more" class="btn btn-primary mt-3">Charger tous</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+        
+
+    
     
     
 </div>
 
 
+<script>
+    const loadMoreBtn = document.getElementById('load-more');
 
+loadMoreBtn.addEventListener('click', function() {
+    const offset = document.querySelectorAll('.load-more').length * 5;
+    const url = '{{ path('more_comments', {'id': trick.id, 'offset': 0}) }}'.replace('0', offset);
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const commentContainer = document.getElementById('comment-container');
+            commentContainer.insertAdjacentHTML('beforeend', data.html);
+
+            if (data.html.length < 5) {
+                loadMoreBtn.style.display = 'none';
+            }
+        });
+});
+
+</script>
 
 {% endblock %}
+

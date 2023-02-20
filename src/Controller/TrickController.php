@@ -10,6 +10,7 @@ use App\Form\CommentFormType;
 use App\Form\AddTrickFormType;
 use App\Service\PictureService;
 use App\Repository\TricksRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -130,25 +131,26 @@ class TrickController extends AbstractController
     }
 
     #[Route('/suppression-video/{id}', name: 'delete_video')]
-    // #[Security("is_granted('ROLE_USER')")]
+    
 
-    public function deleteVideo(Videos $videos, EntityManagerInterface $entityManager, Request $request, CsrfTokenManagerInterface $csrfTokenmanager): JsonResponse
+    public function deleteVideo(Videos $videos, EntityManagerInterface $entityManager, Request $request ): Response
     {
-        
-
+        $this->denyAccessUnlessGranted('ROLE_USER');
+        $params = ['id' =>$videos->getTricks()->getId()];
         // on récupère le contenu de la requete
-        $data = json_decode($request->getContent(), true);
+        // $data = json_decode($request->getContent(), true);
 
         // on vérifie le token
-        if($this->isCsrfTokenValid('delete' .$videos->getId(), $data['_token'])){
+        // if($this->isCsrfTokenValid('delete' .$videos->getId(), $data['_token'])){
             // le token csrf est valide
             $entityManager->remove($videos);
             $entityManager->flush();
 
-            return new JsonResponse(['success' => true], 200);
-            }
+            return $this->redirectToRoute('edit_trick',$params);
+            // return new JsonResponse(['success' => true], 200);
+            // }
 
-        return new JsonResponse(['error' => 'Token invalide'], 400);
+        // return new JsonResponse(['error' => 'Token invalide'], 400);
     }
 
     #[Route('/suppression-image/{id}', name: 'delete_image', methods:['DELETE'])]
@@ -181,7 +183,7 @@ class TrickController extends AbstractController
     }
 
 
-    #[Route('/modification-figure/{id}', name: 'edit_trick')]
+    #[Route('/modification-figure/{slug}', name: 'edit_trick')]
     public function edit(Tricks $trick, Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, PictureService $pictureService): Response
     {
         //on verifie si l'utilisateur peut éditer avec le voter
@@ -212,7 +214,6 @@ class TrickController extends AbstractController
                 $img->setType('picture');
                 $img->setMain(0);
                 $trick->addMedias($img);
-
 
             }
 
@@ -286,5 +287,16 @@ class TrickController extends AbstractController
             'trick' => $tricks
         ]);
         
+    }
+
+
+
+    #[Route('/trick/{id}/comments/more/{offset}', name: 'more_comments')]
+    public function loadMoreComments( Tricks $tricks, $offset)
+    {
+        $html = $this->renderView('trick/_comments.html.twig', [
+            'trick' => $tricks,
+        ]);
+        return new JsonResponse(['html' => $html]);
     }
 }

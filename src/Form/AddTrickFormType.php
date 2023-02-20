@@ -54,12 +54,6 @@ class AddTrickFormType extends AbstractType
                 ]
             ])
 
-            // ->add('video', TextType::class, [
-            //     'label' => 'ajout video',
-            //     'mapped' =>false,
-            //     'required' =>false,
-                
-            // ])
 
             ->add('videos', CollectionType::class, [
                 'entry_type' => VideosFormType::class,

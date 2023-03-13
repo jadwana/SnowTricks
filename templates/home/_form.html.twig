@@ -23,19 +23,19 @@
         <h2>Videos</h2>
         {% for video in trick.videos %}
                 <div>
-                    <div class="ratio ratio-16x9 mt-3">
-                        <iframe allowfullsreen src="{{ video.link }}" frameborder="0" ></iframe>
+                    <div class="ratio ratio-16x9 mt-3 ">
+                        <iframe width="280" height="158" allowfullsreen src="{{ video.link }}" frameborder="0" ></iframe>
                     </div>
                     
-                      <a href="{{path('delete_video', { id: video.id })}}" ><i class="fa-solid fa-trash-can"></i></a>  
+                      <a href="{{path('delete_video', {id: video.id})}}" ><i class="fa-solid fa-trash-can"></i></a>  
                 </div> 
-                {# data-delete data-token="{{csrf_token('delete' ~ video.id )}}" #}
+                
         {% endfor %}
     {% endif %}
 
     {{form_row(form.images)}}
     Ajouter une video
-    (coller le lien embed)
+    (coller le lien)
     <button type="button" class="btn btn-primary add_video_link" data-collection-holder-class="videos"><i class="fa-solid fa-square-plus"></i></button>
     <div class="form">
         <ul class="videos"
@@ -56,7 +56,7 @@
     <button type="submit" class="btn btn-primary"> {{button_label|default('Ajouter')}} </button>
     {% if app.request.attributes.get('_route') == 'edit_trick' %}
     
-    <a href="{{path('delete_trick', {'id' : trick.id})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" class="btn btn-primary">Supprimer</a>
+    <a href="{{path('delete_trick', {'slug' : trick.slug})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" class="btn btn-primary">Supprimer</a>
     {% endif %}
     {{form_end(form)}}
 

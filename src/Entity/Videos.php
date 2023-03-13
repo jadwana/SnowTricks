@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\VideosRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\VideosRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: VideosRepository::class)]
 class Videos
@@ -14,6 +15,10 @@ class Videos
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Url(
+        protocols: ['https'],
+        message: 'The url {{ value }} is not a valid url',
+    )]
     private ?string $link = null;
 
     #[ORM\ManyToOne(inversedBy: 'videos')]

@@ -21,7 +21,7 @@
               <div class="card-img-overlay"> 
                 {% if app.user and app.user.isVerified %}
                 <a href=" {{path('edit_trick', {'slug' : trick.slug})}} " ><i class="fa fa-edit"></i></a>
-                <a href="{{path('delete_trick', {'id' : trick.id})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt"></i></a>
+                <a href="{{path('delete_trick', {'slug' : trick.slug})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt"></i></a>
               {% endif %}
               
               </div>
@@ -65,12 +65,11 @@
     {% endif %}
 
     <h3>Commentaires :</h3>
-    <div class="container mx-auto" id="comment-container">
-        <div class="row mt-3">
+    <div class="container mx-auto" >
+        <div class="row mt-3 justify-content-center">
             <div class="col-6">
-                {% set sorted_comments = trick.comments|sort((b, a) => a.createdAt <=> b.createdAt) %}
-                {% for comment in sorted_comments|slice(0, 5) %}
-                <div class="row border border-primary mb-3">
+                {% for comment in comments.data %}
+                <div class="row p-3 bg-body rounded mb-3 shadow">
                     <div class="col-3">
                         {% if comment.author.avatar is null %}
                             <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
@@ -85,42 +84,17 @@
                 </div>
                 
                 {% endfor %}
-                {% if sorted_comments|length >5 %}
-                <div class="row load-more">
-                    <button id="load-more" class="btn btn-primary mt-3">Charger tous</button>
-                </div>
-                {% endif %}
+               {% set path = 'app_trick'%}
+               {% set slug = trick.slug %}
+               {% set pages = comments.pages %}
+               {% set currentPage = comments.page %}
+               <div class="position-relative">
+                {% include "_partials/_pagination.html.twig" %}
+               </div>
+               
             </div>
         </div>
     </div>
-        
-
-    
-    
-    
 </div>
-
-
-<script>
-    const loadMoreBtn = document.getElementById('load-more');
-
-loadMoreBtn.addEventListener('click', function() {
-    const offset = document.querySelectorAll('.load-more').length * 5;
-    const url = '{{ path('more_comments', {'id': trick.id, 'offset': 0}) }}'.replace('0', offset);
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            const commentContainer = document.getElementById('comment-container');
-            commentContainer.insertAdjacentHTML('beforeend', data.html);
-
-            if (data.html.length < 5) {
-                loadMoreBtn.style.display = 'none';
-            }
-        });
-});
-
-</script>
-
 {% endblock %}
 

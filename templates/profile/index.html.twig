@@ -3,7 +3,21 @@
 {% block title %}Mon Compte{% endblock %}
 
 {% block body %}
-<h2>Bienvenue sur votre espace membre</h2>
-mes informations
+<h2>Bienvenue sur votre espace membre {{user.username}}</h2>
+<h3>
+    Mes informations :
+</h3>
+<ul>
+    <li>
+        Mon pseudo : {{user.username}}
+    </li>
+    <li>
+        Mon adresse mail : {{user.email}}
+    </li>
+    <li>
+        Mon avatar :
+        <img src="{{asset('assets/uploads/avatars/mini/300x300-'~ user.avatar)}}" alt="avatar">
+    </li>
+</ul>
 modifier mon mot de passe
 {% endblock %}

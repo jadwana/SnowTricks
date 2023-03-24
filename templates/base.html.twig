@@ -15,16 +15,16 @@
         {% block stylesheets %}{% endblock %}
         <link href="{{asset('assets/css/style.css')}}" rel="stylesheet">
 
-        <script src=" {{asset('assets/js/bootstrap.bundle.min.js')}} "defer></script>
+        <script src=" {{asset('assets/js/bootstrap.bundle.min.js')}} " defer></script>
         {% block javascripts %}{% endblock %}
-        <script src=" {{asset('assets/js/scripts.js')}} "defer></script>
+        <script src=" {{asset('assets/js/scripts.js')}} " defer></script>
     </head>
     <body>
         {% include "_partials/_nav.html.twig" %}
             {% if app.user and app.user.isVerified == false %}
                 <div class="alert alert-warning alert-dismissible" role="alert">
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    <div class="alert-message">
+                    <div class="alert-message text-center">
                         <strong>Votre compte n'est pas activé</strong>, <a href=" {{path('resend_verif')}} ">renvoyer le lien d'activation</a>
                     </div>
                 </div>
@@ -32,6 +32,8 @@
         {% include "_partials/_flash.html.twig" %}  
         {% block body %}{% endblock %}
         {% include "_partials/_footer.html.twig" %}
+        
+        
     </body>
 </html>
 

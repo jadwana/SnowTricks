@@ -5,27 +5,26 @@
 
 {% block body %}
 <main class="container">
-  <div class="my-4 py-5 text-center " style="background: center/cover url('assets/pictures/main.jpg') ; height: 48rem">
-    <h1 class="container " id="banner">
-      Partager vos tricks avec la communauté
-    </h1>
-        
-  </div>
+  
+      <div class="bg-image my-3" style="background: center/cover url('assets/pictures/main.jpg')">
+       <h1 class="text-center">Partager vos tricks avec la communauté</h1>
+       <a href="#tricks-container"><i class="fa-sharp fa-regular fa-arrow-down"></i></a>
+      </div>
   <hr>
-  <div class="row text-center">
-    <a href="{{path('add_trick')}}">Ajouter une figure</a>
-  </div>
-    <hr>
-  <div class="row mb-2">
-    {% for trick in tricks %}
-        <div class="col-md-6">
-          <div class="card" style="width: 18rem;">
-            {% set chemin = 'defaut.svg' %}
+    <div class="row text-center">
+        <a href="{{path('add_trick')}}" class="fw-bold">Ajouter une figure</a>
+    </div>
+  <hr>
+  <section class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4 my-3">
+    {% for trick in tricks|slice(0, 5) %}
+
+        <div class="col">
+          <div class="card h-100 mb-3 shadow-sm">
+            {% set chemin = 'defaut.jpg' %}
               {% for media in trick.medias %}
-                
                   {% if  media.main == true %}
                     {% set chemin = media.path %}
-                    {% elseif chemin == 'defaut.svg' %}
+                    {% elseif chemin == 'defaut.jpg' %}
                       {% if  media.main == true %}
                         {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
                         {% set chemin = media.path %}
@@ -35,28 +34,54 @@
 
               <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
 
-              <div class="card-body">
-                <div class="row">
+              <div class="card-text">
+                <div class="row mt-3 ms-3">
                   <div class="col-6"><a href="{{ path('app_trick', {'slug' : trick.slug})}}"><h5 class="card-title">{{trick.name}}</h5></a></div>
-                  
-                </div>
-               
-                <div class="mb-1 text-muted">{{trick.createdAt|date('d/m/Y à H:i')}}</div>
-
-                <div class="row">
-                  {% if app.user and app.user.isVerified %}
-                  
-                    <a href=" {{path('edit_trick', {'id' : trick.id})}} " ><i class="fa fa-edit"></i></a>
-                    <a href="{{path('delete_trick', {'id' : trick.id})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt"></i></a>
-                  
-                  {% endif %}
+                  <div class="col-6">
+                    {% if app.user and app.user.isVerified %}
+                    <div class="row">
+                      <div class="col-6">
+                        <a href=" {{path('edit_trick', {'slug' : trick.slug})}} " ><i class="fa fa-edit"></i></a>
+                      </div>
+                      <div class="col-6">
+                        <a href="{{path('delete_trick', {'slug' : trick.slug})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt"></i></a>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       {% endfor %}
-  </div>
+    </section>
+
+    <section class = "row row-cols-1 row-cols-md-5 g-4 my-3" id="tricks-container"></section>
+    {% if tricks|length >5 %}
+    <div class="text-center">
+    <button id="load-more" class="btn my-5"><i class="fa-regular fa-spinner"></i> Charger plus</button>
+    </div>
+    {% endif %}
+
+      <script>
+        const loadMoreBtn = document.getElementById('load-more');
+        let offset = 0;
+        loadMoreBtn.addEventListener('click', function() {
+        offset +=5;
+        const url = '{{ path('more_tricks', {'offset': 0}) }}'.replace('0', offset);
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const tricksContainer = document.getElementById('tricks-container');
+                tricksContainer.insertAdjacentHTML('beforeend', data.html);
+                console.log(document.getElementsByClassName("card-img-top").length % 5)
+                if (document.getElementsByClassName("card-img-top").length == {{ tricks|length }}) {
+                  loadMoreBtn.style.display = 'none';
+                }
+            });
+        });
+      </script>
     
         
 </main>

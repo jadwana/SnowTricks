@@ -1,8 +1,31 @@
-<section class="container-fluid">
-    <footer class="text-center">
-        <p>SnowTricks</p>
-        <p>
-        <a href="#">Back to top</a>
+<section class="container mt-5">
+    <footer>
+        <p class="text-end fs-1">
+            <a href="#top" ><i class="fa-sharp fa-solid fa-arrow-up"></i></a>
         </p>
-        </footer>
+        <p class="text-center">SnowTricks</p>
+
+        <div class=" fs-3 d-sm-none d-block">
+            <div class="row fixed-bottom py-3 bg-light">
+                <div class="col-6 text-center">
+                    <a href="/"><i class="fa-solid fa-house"></i></a>
+                </div>
+                <div class="col-6 text-center">
+                    {% if app.user %}
+                    <a href="{{path('app_logout')}}"><i class="fa-regular fa-arrow-right-from-bracket"></i></a>
+                    {% else %}
+                    <div class="row">
+                        <div class="col"><a href="{{path('app_register')}}"><i class="fa-solid fa-bookmark"></i></a></div>
+                        <div class="col"><a href="{{path('app_login')}}"><i class="fa-solid fa-right-to-bracket"></i></a></div>
+                    </div>
+                    
+                    
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+       
+
+
+    </footer>
 </section>

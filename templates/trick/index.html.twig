@@ -5,81 +5,116 @@
 {% block body %}
 
 <div class="container">
-    <div class="card" >
-        {% set chemin = 'defaut.svg' %}
+    <div class="card mt-2" >
+        {% set field = 'defaut.svg' %}
               {% for media in trick.medias %}
                   {% if media.main == true %}
-                    {% set chemin = media.path %}
-                    {% elseif chemin == 'defaut.svg' %}
+                    {% set field = media.path %}
+                    {% elseif field == 'defaut.svg' %}
                       {% if media.main == true %}
                         {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
-                        {% set chemin = media.path %}
+                        {% set field = media.path %}
                       {% endif %}
                     {% endif %}
               {% endfor %} 
-              <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ chemin }} " class="card-img-top img-fluid mx-auto" alt="{{trick.name}}">
-              <div class="card-img-overlay"> 
-                {% if app.user and app.user.isVerified %}
-                <a href=" {{path('edit_trick', {'slug' : trick.slug})}} " ><i class="fa fa-edit"></i></a>
-                <a href="{{path('delete_trick', {'slug' : trick.slug})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt"></i></a>
-              {% endif %}
-              
-              </div>
+        <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ field }} " class="card-img-top img-fluid mx-auto mt-3" alt="{{trick.name}}">
+        <div class="card-img-overlay"> 
+            {% if app.user and app.user.isVerified %}
+                <div class="position-relative">
+                    <a href=" {{path('edit_trick', {'slug' : trick.slug})}} " ><i class="fa fa-edit position-absolute edit-icon"></i></a>
+                    <a href="{{path('delete_trick', {'slug' : trick.slug})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt position-absolute delete-icon"></i></a>
+                </div>
+            {% endif %}
+        </div>
         <div class="card-body text-center">
             <h2 class="card-title text-center">{{ trick.name}}</h2>
-        <h6 class="card-subtitle mb-2 text-muted">Ajouté le : {{ trick.createdAt|date('d/m/Y à H:i')}}</h6>
-        {% if trick.updatedAt is not null %}
-        <h6 class="card-subtitle mb-2 text-muted">Modifié le : {{ trick.updatedAt|date('d/m/Y à H:i')}}</h6>
-        {% endif %}
-        <p class="card-text"> {{trick.category.name}} </p>
-        <hr>
-        <p class="card-text">{{ trick.description}}</p>
-        </div>
-    </div>
-
-    <div class="row mt-3">
-        <div class="col-6">
-            {% for media in trick.medias %}
-                
-                    <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ media.path }} " alt="{{trick.name}}">
-                
-            {% endfor %}
-        </div>
-        <div>
-            {% for video in trick.videos %}
-            <div class="ratio ratio-16x9 mt-3">
-                <iframe allowfullsreen src="{{ video.link }}" frameborder="0"></iframe>
+            <div class="row justify-content-md-center my-5">
+                <div class="col">
+                    <p class="card-text mb-2 text-muted">Ajoutée le : {{ trick.createdAt|date('d/m/Y')}}</p>
+                </div>
+                <div class="col">
+                    {% if trick.updatedAt is not null %}
+                        <p class="card-text mb-2 text-muted">Modifiée le : {{ trick.updatedAt|date('d/m/Y')}}</p>
+                    {% endif %}
+                </div>
+                <div class="col">
+                    <p class="card-text">Catégorie :  {{trick.category.name}} </p>
+                </div>
             </div>
-            {% endfor %}
+        <hr>
+        <p class="card-text my-5">{{ trick.description}}</p>
         </div>
     </div>
-
-    <h3>Ajouter un commentaire</h3>
+    {% if trick.medias|length > 0 or trick.videos|length > 0 %}
+        <div class="text-center mt-5 d-sm-none d-block">
+            <button type="button" class="btn btn-show">Afficher les médias</button>
+        </div>
+        <div class="text-center mt-5">
+            <button type="button" class="btn btn-mute">Cacher les médias</button>
+        </div>
+        <section class="show-medias" >
+            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 my-5">
+                {% for media in trick.medias %}
+                    {% if media.path != field %}
+                    <div class="col text-center">
+                        <div class=" my-3 ">
+                            <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ media.path }} " class=" img-fluid rounded shadow-sm" alt="{{trick.name}}">
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                {% for video in trick.videos %}
+                <div class="col">
+                    <div class="ratio ratio-16x9 mt-5 ">
+                        <iframe class="shadow-sm rounded" allowfullsreen src="{{ video.link }} " frameborder="0"></iframe>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% else %}
+        <div class="my-3 text-center">
+            Il n'y a pas de médias pour cette figure.
+        </div>
+    {% endif %}
+   
+    
+        <hr>
     {% if form is defined %}
     {{ form_start(form) }}
-    {{ form_widget(form.content) }}
-    <button type="submit" class="btn btn-primary my-3">Ajouter un commentaire</button>
+    <div class="row justify-content-md-center my-3">
+        <div class="col col-lg-6">
+            {{ form_widget(form.content) }}
+        </div>
+        <div class="w-100 d-block d-sm-none"></div>
+        <div class="col text-center col-md-auto ">
+            <button type="submit" class="btn btn-primary my-3">Ajouter un commentaire</button>
+        </div>
+    </div>
+    
     {{ form_end(form) }}
     {% else %}
-    Vous devez être connecté pour pouvoir ajouter un commentaires
+    Vous devez être connecté·e pour pouvoir ajouter un commentaires
     {% endif %}
-
-    <h3>Commentaires :</h3>
+        <hr>
     <div class="container mx-auto" >
-        <div class="row mt-3 justify-content-center">
-            <div class="col-6">
+        <div class="row mt-5 justify-content-center">
+            <div class="col-12 col-lg-8">
+                {% if comments.data is defined %}
                 {% for comment in comments.data %}
                 <div class="row p-3 bg-body rounded mb-3 shadow">
-                    <div class="col-3">
+                    <div class="col-auto">
                         {% if comment.author.avatar is null %}
                             <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
                         {% else %}
                             <img src=" {{asset('assets/uploads/avatars/mini/300x300-') ~ comment.author.avatar }} " style="max-width: 50px;" alt="{{trick.name}}">
                         {% endif %}
                     </div>
-                    <div class="col-9">
-                        <div class="row">{{comment.author.username}} le {{comment.createdAt|date('d/m/Y à H:i')}}</div>
-                        <div class="row">{{comment.content}}</div>
+                    <div class="col">
+                        <div>
+                            <span class="fw-bold ">{{comment.author.username}}</span><span class="fst-italic"> le {{comment.createdAt|date('d/m/Y')}}</span>
+                        </div>
+                        <div>{{comment.content}}</div>
                     </div>
                 </div>
                 
@@ -91,10 +126,22 @@
                <div class="position-relative">
                 {% include "_partials/_pagination.html.twig" %}
                </div>
+               {% else %}
+               <div class="text-center">
+                Il n'y a pas encore de commentaires pour cette figure, soyez la·e premier·e à en ajouter un !
+               </div>
+               
+                {% endif %}
+                
                
             </div>
         </div>
     </div>
 </div>
+
+
+{% endblock %}
+{% block javascripts %}
+    <script src=" {{asset('assets/js/show.js')}}" defer></script>
 {% endblock %}
 

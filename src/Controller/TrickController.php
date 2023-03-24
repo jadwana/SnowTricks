@@ -30,13 +30,7 @@ class TrickController extends AbstractController
         ]);
     }
 
-    #[Route('/hello', name: 'hello')]
-    public function hello()
-    {
 
-
-        return new JsonResponse(['message' => 'coucou !']);
-    }
 
     #[Route('/ajout-figure', name: 'add_trick')]
     public function addTrick(
@@ -125,7 +119,7 @@ class TrickController extends AbstractController
     #[Route('/image-principale/{id}', name: 'main_picture')]
     public function mainPicture(Medias $medias, EntityManagerInterface $entityManager)
     {
-        $params = ['id' => $medias->getTricks()->getId()];
+        $params = ['slug' => $medias->getTricks()->getSlug()];
         $trickmedias = $medias->getTricks()->getMedias();
         foreach ($trickmedias as $media) {
             $media->setMain(0);
@@ -156,7 +150,7 @@ class TrickController extends AbstractController
     }
 
     #[Route('/suppression-video/{id}', name: 'delete_video')]
-    public function deleteVideo(Videos $videos, EntityManagerInterface $entityManager, Request $request): Response
+    public function deleteVideo(Videos $videos, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         $params = ['slug' => $videos->getTricks()->getSlug()];
@@ -238,11 +232,6 @@ class TrickController extends AbstractController
                 // on valide que c'est bien une url
                 $errors = $validator->validate($video);
                 if (count($errors) > 0) {
-                    /*
-                     * Uses a __toString method on the $errors variable which is a
-                     * ConstraintViolationList object. This gives us a nice string
-                     * for debugging.
-                     */
                     $errorsString = (string) $errors;
                     throw new \Exception($errorsString);
 
@@ -253,7 +242,6 @@ class TrickController extends AbstractController
 
                 // on modifie le lien 
                 $lien = explode("/", $video->getLink());
-                // dd($lien);
                 if ($lien[3] == "embed") {
                     $link = $video->getlink();
                 } else if ($lien[2] == "www.youtube.com") {
@@ -310,7 +298,7 @@ class TrickController extends AbstractController
         $page = $request->query->getInt('page', 1);
 
         $comments = $commentsRepository->findCommentsPaginated($page, $tricks->getSlug(), 5);
-        // dd($comments);
+
         $user = $this->getUser();
         //on verifie que l'utilisateur est logué et qu'il a validé son compte pour accéder au formulaire d'ajout de commentaire
         if ($user && $user->getIsVerified()) {
@@ -328,7 +316,7 @@ class TrickController extends AbstractController
                 $entityManager->persist($comment);
                 $entityManager->flush();
 
-                $this->addFlash('success', 'commentaire ajouté avec succès');
+                $this->addFlash('success', 'Commentaire ajouté avec succès');
 
                 return $this->redirectToRoute('app_trick', ['slug' => $tricks->getSlug()]);
             }

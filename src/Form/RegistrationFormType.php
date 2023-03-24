@@ -32,19 +32,7 @@ class RegistrationFormType extends AbstractType
                 ],
                 'label' => 'Email'
             ])
-            // ->add('rgpd', CheckboxType::class, [
-            //     'mapped' => false,
-            //     'constraints' => [
-            //         new IsTrue([
-            //             'message' => 'Vous devez accepter les termes pour pouvoir vous inscrire',
-            //         ]),
-            //     ],
-            //     'label' => 'Merci d\'accepter les termes relatifs au RPD en cochant la case ci-dessous :',
-            //     'attr' => [
-            //         'class' => 'form-check'
-            //     ],
-                
-            // ])
+
             ->add('plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
@@ -70,8 +58,7 @@ class RegistrationFormType extends AbstractType
             ->add('avatar', FileType::class, [
                 'label' => 'Ajouter une image d\'avatar',
                 'required' => false,
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -1,15 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modification Trick{% endblock %}
+{% block title %}Modification {{trick.name}}{% endblock %}
 
 
 {% block body %}
     <main class="container">
-        <section class="row">
-            <div class="col-12">
-                <h2>Modifier la figure : {{trick.name}}</h2>
+        <section>
+                <h2 class="text-center mt-5">Modifier la figure : {{trick.name}}</h2>
                 {% include "home/_form.html.twig" with {'button_label': 'Modifier'} %}
-            </div>
         </section>
     </main>
 
@@ -17,5 +15,6 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script src=" {{asset('assets/js/image.js')}}" defer></script>
+    <script src=" {{asset('assets/js/delete.js')}}" defer></script>
+    <script src=" {{asset('assets/js/show.js')}}" defer></script>
 {% endblock %}

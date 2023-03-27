@@ -3,8 +3,6 @@
 namespace App\Security\Voter;
 
 use App\Entity\Tricks;
-use Exception;
-use phpDocumentor\Reflection\PseudoTypes\False_;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -25,10 +23,10 @@ class TricksVoter extends Voter
 
     protected function supports(string $attribute, $trick): bool
     {
-        if(!in_array($attribute, [self::EDIT, self::DELETE])){
+        if (!in_array($attribute, [self::EDIT, self::DELETE])) {
             return false;
         }
-        if(!$trick instanceof Tricks){
+        if (!$trick instanceof Tricks) {
             return false;
         }
         return true;
@@ -42,17 +40,17 @@ class TricksVoter extends Voter
         // on récupère l'utilisateur à partir du token
         $user = $token->getUser();
         //on vérifie que le compte a été validé
-        if(!$user->getIsVerified()) return False;
+        if (!$user->getIsVerified()) return False;
 
         //on vérife que l'utilisateur est bien une instance de userinterface
-        if(!$user instanceof UserInterface) return false;
-        
-        // on vérifie si l'utilisateur est admin
-        if(!$this->security->isGranted('ROLE_ADMIN')) return TRUE;
+        if (!$user instanceof UserInterface) return false;
 
-        
+        // on vérifie si l'utilisateur est admin
+        if (!$this->security->isGranted('ROLE_ADMIN')) return TRUE;
+
+
         // si utilisateur pas admin on verifie les permissions
-        switch($attribute){
+        switch ($attribute) {
             case self::EDIT:
                 // On vérifie si l'utilisateur peut éditer
                 return $this->canEdit();
@@ -64,12 +62,12 @@ class TricksVoter extends Voter
         }
     }
 
-    private function canEdit(){
-
-       
+    private function canEdit()
+    {
         return $this->security->isGranted('ROLE_USER');
     }
-    private function canDelete(){
+    private function canDelete()
+    {
         return $this->security->isGranted('ROLE_USER');
     }
 }

@@ -12,7 +12,10 @@
                 </div>
                 <div class="col-6 text-center">
                     {% if app.user %}
-                    <a href="{{path('app_logout')}}"><i class="fa-regular fa-arrow-right-from-bracket"></i></a>
+                    <div class="row">
+                        <div class="col"><a href="{{path('app_profile')}}"><i class="fa-solid fa-address-card"></i></a></div>
+                        <div class="col"><a href="{{path('app_logout')}}"><i class="fa-regular fa-arrow-right-from-bracket"></i></a></div>
+                    </div>
                     {% else %}
                     <div class="row">
                         <div class="col"><a href="{{path('app_register')}}"><i class="fa-solid fa-bookmark"></i></a></div>

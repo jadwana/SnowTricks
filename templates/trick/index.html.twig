@@ -104,10 +104,10 @@
                 {% for comment in comments.data %}
                 <div class="row p-3 bg-body rounded mb-3 shadow">
                     <div class="col-auto">
-                        {% if comment.author.avatar is null %}
-                            <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
+                        {% if comment.author.avatar %}
+                            <img src=" {{asset('assets/uploads/avatars/mini/300x300-') ~ comment.author.avatar }} " class="rounded-circle" style="max-width: 50px;" alt="{{trick.name}}">
                         {% else %}
-                            <img src=" {{asset('assets/uploads/avatars/mini/300x300-') ~ comment.author.avatar }} " style="max-width: 50px;" alt="{{trick.name}}">
+                            <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
                         {% endif %}
                     </div>
                     <div class="col">

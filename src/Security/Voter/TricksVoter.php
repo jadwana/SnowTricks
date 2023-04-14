@@ -3,14 +3,15 @@
 namespace App\Security\Voter;
 
 use App\Entity\Tricks;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Bundle\SecurityBundle\Security;
+// use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class TricksVoter extends Voter
 {
-    // on définie les constantes qui seront utilisées
+    // we define the constants that will be used
     const EDIT = 'TRICK_EDIT';
     const DELETE = 'TRICK_DELETE';
 
@@ -30,33 +31,26 @@ class TricksVoter extends Voter
             return false;
         }
         return true;
-
-        //peut etre remplacé par cette ligne
-        // return in_array($attribute, [self::EDIT, self::DELETE]) && $trick instanceof Tricks;
     }
 
     protected function voteOnAttribute($attribute, $trick, TokenInterface $token): bool
     {
-        // on récupère l'utilisateur à partir du token
+        // we get the user from the token
         $user = $token->getUser();
-        //on vérifie que le compte a été validé
+        // we verify that the account has been validated
         if (!$user->getIsVerified()) return False;
-
-        //on vérife que l'utilisateur est bien une instance de userinterface
+        // we check that the user is indeed an instance of userinterface
         if (!$user instanceof UserInterface) return false;
-
-        // on vérifie si l'utilisateur est admin
+        // we check if the user is admin
         if (!$this->security->isGranted('ROLE_ADMIN')) return TRUE;
-
-
-        // si utilisateur pas admin on verifie les permissions
+        // if user not admin we check the permissions
         switch ($attribute) {
             case self::EDIT:
-                // On vérifie si l'utilisateur peut éditer
+                // We check if the user can edit
                 return $this->canEdit();
                 break;
             case self::DELETE:
-                // On vérifie si l'utilisateur peut supprimer
+                // We check if the user can delete
                 return $this->canDelete();
                 break;
         }

@@ -1,41 +1,20 @@
-            {% set nb = offset %}
-            {% for trick in tricks|slice(nb, nb + 5) %}
-            <div class="col">
-                <div class="card h-100 mb-3">
-                  {% set chemin = 'defaut.jpg' %}
-                    {% for media in trick.medias %}
-                        {% if  media.main == true %}
-                          {% set chemin = media.path %}
-                          {% elseif chemin == 'defaut.jpg' %}
-                            {% if  media.main == true %}
-                              {% elseif  media.type == 'picture' and media.path == trick.medias|first.path %}
-                              {% set chemin = media.path %}
-                            {% endif %}
-                          {% endif %}
-                    {% endfor %} 
-      
-                    <img src=" {{asset('assets/uploads/tricks/mini/300x300-') ~ chemin }} " class="card-img-top img-fluid" alt="{{trick.name}}">
-      
-                    <div class="card-text">
-                      <div class="row mt-3 ms-3">
-                        <div class="col-6"><a href="{{ path('app_trick', {'slug' : trick.slug})}}"><h5 class="card-title">{{trick.name}}</h5></a></div>
-                        <div class="col-6">
-                          {% if app.user and app.user.isVerified %}
-                          <div class="row">
-                            <div class="col-6">
-                              <a href=" {{path('edit_trick', {'slug' : trick.slug})}} " ><i class="fa fa-edit text-dark"></i></a>
-                            </div>
-                            <div class="col-6">
-                              <a href="{{path('delete_trick', {'slug' : trick.slug})}}" onclick="return confirm('etes vous sur de vouloir supprimer?')" ><i class="fa fa-trash-alt text-dark"></i></a>
-                            </div>
-                          </div>
-                          {% endif %}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            
-            {% endfor %}
-            
+{% set nb = offset %}
+{% for trick in tricks|slice(nb, nb + 5) %}
+<div class="col">
+  <div class="card h-100 mb-3 shadow-sm">
+    {% include "_partials/_main_picture.html.twig" with { "tricks" : trick.medias, "display" : "img"} %}
+    <div class="card-text">
+      <div class="row mt-3 ms-3">
+        <div class="col-6"><a href="{{ path('app_trick', {'slug' : trick.slug})}}">
+            <h5 class="card-title">{{trick.name}}</h5>
+          </a>
+        </div>
+        <div class="col-6">
+          {% include "_partials/_link_trick.html.twig" with { "user" : app.user, "class1" : "row", "class2" : "col-6",
+          "edit" : "" , "delete": ""}%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}

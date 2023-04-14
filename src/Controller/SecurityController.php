@@ -21,10 +21,6 @@ class SecurityController extends AbstractController
     #[Route(path: '/connexion', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
-
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
@@ -55,24 +51,20 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            //on va chercher l'utilisateur par son pseudo
+            // we will look for the user by his nickname
             $user = $usersRepository->findOneByUsername($form->get('username')->getData());
-
-            //on verifie si on a un utilisateur
+            // we check if we have a user
             if ($user) {
-                // on génère un token de réinitialisation
+                // we generate a reset token
                 $token = $tokenGeneratorInterface->generateToken();
                 $user->setResetToken($token);
                 $entityManagerInterface->persist($user);
                 $entityManagerInterface->flush();
-
-                //on génère un lien de réinitialisation du mot de passe
+                // generate a password reset link
                 $url = $this->generateUrl('reset_password', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
-
-                //on crée les données du mail
+                // we create the email data
                 $context = compact('url', 'user');
-
-                //envoi du mail
+                // send email
                 $mail->send(
                     'no-reply@snowtricks.fr',
                     $user->getEmail(),
@@ -84,7 +76,7 @@ class SecurityController extends AbstractController
                 $this->addFlash('success', 'Email envoyé avec succès, vérifier votre boite mail');
                 return $this->redirectToRoute('app_login');
             }
-            //$user est nul
+            // $user is null
             $this->addFlash('danger', 'Un problème est survenu');
             return $this->redirectToRoute('app_login');
         }
@@ -102,7 +94,7 @@ class SecurityController extends AbstractController
         EntityManagerInterface $entityManagerInterface,
         UserPasswordHasherInterface $passwordHacher
     ): Response {
-        // on vérifie si on a ce token dans la bdd
+        // we check if we have this token in the database
         $user = $usersRepository->findOneByResetToken($token);
 
         if ($user) {
@@ -115,7 +107,7 @@ class SecurityController extends AbstractController
                     $this->addFlash('danger', 'Le pseudo ne correspond pas, réessayer');
                     return $this->redirectToRoute('forgotten_password');
                 }
-                //on efface le token
+                // we erase the token
                 $user->setResetToken('');
                 $user->setPassWord(
                     $passwordHacher->hashPassword(

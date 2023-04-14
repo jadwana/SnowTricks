@@ -21,7 +21,7 @@ class SendMailService
         array $context
     ): void
     {
-        //On crée le mail
+        // We create the email
         $email = (new TemplatedEmail())
             ->from($from)
             ->to($to)
@@ -29,7 +29,7 @@ class SendMailService
             ->htmlTemplate("emails/$template.html.twig")
             ->context($context);
 
-        // On envoie le mail
+        // We send the email
         $this->mailer->send($email);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -7,8 +8,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class PictureService
 {
     private $params;
-    
-    // pour recupérer les parametres du fichier services.yaml
+
+    // to retrieve the parameters from the services.yaml file
     public function __construct(ParameterBagInterface $params)
     {
         $this->params = $params;
@@ -16,18 +17,17 @@ class PictureService
 
     public function add(UploadedFile $picture, ?string $folder = '', ?int $width = 250, ?int $height = 250)
     {
-        // on donne un nv nom à l'image
-        $fichier = md5(uniqid(rand(), true)) . '.webp';
+        // we give a new name to the image
+        $file = md5(uniqid(rand(), true)) . '.webp';
 
-        // on récupère les infos de l'image
+        // we retrieve the information of the image
         $picture_infos = getimagesize($picture);
 
-        if($picture_infos === false){
+        if ($picture_infos === false) {
             throw new \Exception('Format d\'image incorrect');
         }
 
-        // on vérifie le format de l'image
-        switch($picture_infos['mime']){
+        switch ($picture_infos['mime']) {
             case 'image/png':
                 $picture_source = imagecreatefrompng($picture);
                 break;
@@ -41,68 +41,67 @@ class PictureService
                 throw new \Exception('Format d\'image incorrect');
         }
 
-        // on recadre l'image
-        // on récupère les dimensions
+        // crop the image
+        // we get the dimensions
         $imageWidth = $picture_infos[0];
         $imageHeight = $picture_infos[1];
 
-        // on vérifie l'orientation de l'image
-        // et on redimmensionne pour avoir un carré
-        switch ($imageWidth <=> $imageHeight){
+        // check the orientation of the image
+        // and we resize to have a square
+        switch ($imageWidth <=> $imageHeight) {
             case -1: // portrait
                 $squareSize = $imageWidth;
                 $src_x = 0;
                 $src_y = ($imageHeight - $squareSize) / 2;
                 break;
-            case 0: // carré
+            case 0: // square
                 $squareSize = $imageWidth;
                 $src_x = 0;
                 $src_y = 0;
                 break;
-            case 1: // paysage
+            case 1: // landscape
                 $squareSize = $imageHeight;
                 $src_x = ($imageWidth - $squareSize) / 2;
                 $src_y = 0;
                 break;
         }
 
-        //on crée une nvelle image vierge pour coller l'image recadrée
+        // we create a new blank image to paste the cropped image
         $resized_picture = imagecreatetruecolor($width, $height);
 
         imagecopyresampled($resized_picture, $picture_source, 0, 0, $src_x, $src_y, $width, $height, $squareSize, $squareSize);
 
-        $path = $this->params->get('images_directory') . $folder;
+        $path = $this->params->get('pictures_directory') . $folder;
 
-        // On crée le dossier de destination s'il n'existe pas
-        if(!file_exists($path . '/mini/')){
+        // We create the destination folder if it does not exist
+        if (!file_exists($path . '/mini/')) {
             mkdir($path . '/mini/', 0755, true);
         }
 
-        // On stocke l'image recadrée
-        imagewebp($resized_picture, $path . '/mini/' . $width . 'x' . $height . '-' . $fichier);
+        // We store the cropped image
+        imagewebp($resized_picture, $path . '/mini/' . $width . 'x' . $height . '-' . $file);
 
-        $picture->move($path . '/', $fichier);
+        $picture->move($path . '/', $file);
 
-        return $fichier;
-        
+        return $file;
     }
 
-    public function delete(string $fichier, ?string $folder = '', ?int $width = 250, ?int $height = 250)
+    public function delete(string $file, ?string $folder = '', ?int $width = 250, ?int $height = 250)
     {
-        if($fichier !== 'default.webp'){
+        if ($file !== 'default.webp') {
             $success = false;
-            $path = $this->params->get('images_directory') . $folder;
+            $path = $this->params->get('pictures_directory') . $folder;
 
-            $mini = $path . '/mini/' . $width . 'x' . $height . '-' . $fichier;
+            $mini = $path . '/mini/' . $width . 'x' . $height . '-' . $file;
 
-            if(file_exists($mini)){
+            if (file_exists($mini)) {
                 unlink($mini);
                 $success = true;
             }
 
-            $original = $path . '/' . $fichier;
+            $original = $path . '/' . $file;
 
-            if(file_exists($original)){
+            if (file_exists($original)) {
                 unlink($original);
                 $success = true;
             }
@@ -110,5 +109,4 @@ class PictureService
         }
         return false;
     }
-
 }

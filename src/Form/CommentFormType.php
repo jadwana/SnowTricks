@@ -17,12 +17,7 @@ class CommentFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-control'
                 ]
-            ])
-            // ->add('createdAt')
-            // ->add('trick')
-            // ->add('author')
-            
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

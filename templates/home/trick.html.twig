@@ -1,0 +1,118 @@
+{% extends 'base.html.twig' %}
+{% block title %} {{ trick.name }} {% endblock %}
+
+{% block body %}
+
+<div class="container">
+    <div class="card mt-2">
+        <div class="mt-3 mx-auto card-img-top img-fluid">
+            {% include "_partials/_main_picture.html.twig" with { "tricks" : trick.medias, "display" : "img"} %}
+        </div>
+        <div class="card-img-overlay">
+            {% include "_partials/_link_trick.html.twig" with { "user" : app.user, "class1" : "position-relative",
+            "class2" : "", "edit" : "edit-icon", "delete" : "delete-icon"} %}
+        </div>
+        <div class="card-body text-center">
+            <h2 class="card-title text-center">{{ trick.name}}</h2>
+            <div class="row justify-content-md-center my-5">
+                <div class="col">
+                    <p class="card-text mb-2 text-muted">Ajoutée le : {{ trick.createdAt|date('d/m/Y')}}</p>
+                </div>
+                <div class="col">
+                    {% if trick.updatedAt is not null %}
+                    <p class="card-text mb-2 text-muted">Modifiée le : {{ trick.updatedAt|date('d/m/Y')}}</p>
+                    {% endif %}
+                </div>
+                <div class="col">
+                    <p class="card-text">Catégorie : {{trick.category.name}} </p>
+                </div>
+            </div>
+            <hr>
+            <p class="card-text my-5">{{ trick.description}}</p>
+        </div>
+    </div>
+    {% if trick.medias|length > 0 or trick.videos|length > 0 %}
+    <div class="text-center mt-5 d-sm-none d-block">
+        <button type="button" class="btn btn-show">Afficher les médias</button>
+    </div>
+    <div class="text-center mt-5">
+        <button type="button" class="btn btn-mute">Cacher les médias</button>
+    </div>
+    <section class="show-medias">
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4 my-5">
+            {% include "_partials/_main_picture.html.twig" with { "tricks" : trick.medias, "display" : "all"} %}
+            {% for video in trick.videos %}
+            <div class="col">
+                <div class="ratio ratio-16x9 mt-5 ">
+                    <iframe class="shadow-sm rounded" allowfullsreen src="{{ video.link ~ '?controls=2' }} " frameborder="0"></iframe>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% else %}
+    <div class="my-3 text-center">
+        Il n'y a pas de médias pour cette figure.
+    </div>
+    {% endif %}
+    <hr>
+    {% if form is defined %}
+    {{ form_start(form) }}
+    <div class="row justify-content-md-center my-3">
+        <div class="col col-lg-6">
+            {{ form_widget(form.content) }}
+        </div>
+        <div class="w-100 d-block d-sm-none"></div>
+        <div class="col text-center col-md-auto ">
+            <button type="submit" class="btn btn-primary my-3">Ajouter un commentaire</button>
+        </div>
+    </div>
+    {{ form_end(form) }}
+    {% else %}
+    <div class="text-center">Vous devez être connecté·e et avoir activé votre compte pour pouvoir ajouter un commentaire
+    </div>
+    {% endif %}
+    <hr>
+    <div class="container mx-auto">
+        <div class="row mt-5 justify-content-center">
+            <div class="col-12 col-lg-8">
+                {% if comments.data is defined %}
+                {% for comment in comments.data %}
+                <div class="row p-3 bg-body rounded mb-3 shadow">
+                    <div class="col-auto">
+                        {% if comment.author.avatar %}
+                        <img src=" {{asset('assets/uploads/avatars/mini/300x300-') ~ comment.author.avatar }} "
+                            class="rounded-circle" style="max-width: 50px;" alt="{{trick.name}}">
+                        {% else %}
+                        <img src=" {{asset('assets/pictures/avatar.png')}} " alt="{{comment.author.username}}">
+                        {% endif %}
+                    </div>
+                    <div class="col">
+                        <div>
+                            <span class="fw-bold ">{{comment.author.username}}</span><span class="fst-italic"> le
+                                {{comment.createdAt|date('d/m/Y')}}</span>
+                        </div>
+                        <div>{{comment.content}}</div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% set path = 'app_trick'%}
+                {% set slug = trick.slug %}
+                {% set pages = comments.pages %}
+                {% set currentPage = comments.page %}
+                <div class="position-relative">
+                    {% include "_partials/_pagination.html.twig" %}
+                </div>
+                {% else %}
+                <div class="text-center">
+                    Il n'y a pas encore de commentaires pour cette figure, soyez la·e premier·e à en ajouter un !
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+<script src=" {{asset('assets/js/show.js')}}" defer></script>
+{% endblock %}

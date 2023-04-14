@@ -2,13 +2,11 @@
 
 namespace App\Form;
 
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 
@@ -23,10 +21,7 @@ class NewPasswordFormType extends AbstractType
                 'label' => 'Votre ancien mot de passe'
             ))
 
-
             ->add('password', RepeatedType::class, [
-                // instead of being set onto the object directly,
-                // this is read and encoded in the controller
                 'type' => PasswordType::class,
                 'first_options' => [
                     'attr' => [

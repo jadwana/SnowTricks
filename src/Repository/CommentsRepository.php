@@ -24,9 +24,9 @@ class CommentsRepository extends ServiceEntityRepository
 
     public function findCommentsPaginated(int $page, string $slug, int $limit = 4): array
     {
-        // on veut que la limite soit tjs positive(valeur absolue)
+        // we want the limit to be always positive (absolute value)
         $limit = abs($limit);
-        // les resultats seront dans un tab qu'on initialise
+        // the results will be in a tab that we initialize
         $result = [];
 
         $query = $this->getEntityManager()->createQueryBuilder()
@@ -41,14 +41,14 @@ class CommentsRepository extends ServiceEntityRepository
         $paginator = new Paginator($query);
         $data = $paginator->getQuery()->getResult();
 
-        // on vérifie qu'on a des données
+        // we check that we have data
         if (empty($data)) {
             return $result;
         }
-        // on calcule le nb de pages
+        // we calculate the number of pages
         $pages = ceil($paginator->count() / $limit);
 
-        // on remplit le tableau
+        // fill in the table
         $result['data'] = $data;
         $result['pages'] = $pages;
         $result['page'] = $page;

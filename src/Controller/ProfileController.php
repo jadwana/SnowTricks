@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Users;
 use App\Form\NewAvatarFormType;
 use App\Service\PictureService;
 use App\Form\NewPasswordFormType;
@@ -23,15 +22,24 @@ class ProfileController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
         $user = $this->getUser();
-        return $this->render('profile/index.html.twig', [
-            'user' => $user
-        ]);
+        if ($user->getIsVerified()) {
+            return $this->render('profile/index.html.twig', [
+                'user' => $user
+            ]);
+        }
+        $this->addFlash('danger', 'Votre compte n\'est pas encore activé');
+        return $this->redirectToRoute('app_home');
     }
 
     #[Route('/mon_compte/nouveau_mot_de_passe', name: 'new_pass')]
 
-    public function newPass(Request $request, UserPasswordHasherInterface $hacher, EntityManagerInterface $entityManager, UsersRepository $usersRepository): Response
-    {
+    public function newPass(
+        Request $request,
+        UserPasswordHasherInterface $hacher,
+        EntityManagerInterface $entityManager,
+        UsersRepository $usersRepository
+    ): Response {
+
         $user = $this->getUser();
         $this->denyAccessUnlessGranted('ROLE_USER');
         $form = $this->createForm(NewPasswordFormType::class);
@@ -39,7 +47,6 @@ class ProfileController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             if ($hacher->isPasswordValid($user, $form->get('oldPassword')->getData())) {
                 $user->setPassword(
                     $hacher->hashPassword(
@@ -53,7 +60,6 @@ class ProfileController extends AbstractController
 
                 return $this->redirectToRoute('app_profile');
             } else {
-
                 $form->addError(new FormError('Ancien mot de passe incorrect'));
             }
         }
@@ -64,8 +70,12 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/mon_compte/nouvel_avatar', name: 'new_avatar')]
-    public function newAvatar(Request $request, EntityManagerInterface $entityManager, PictureService $pictureService): Response
-    {
+    public function newAvatar(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        PictureService $pictureService
+    ): Response {
+
         $user = $this->getUser();
         $this->denyAccessUnlessGranted('ROLE_USER');
         $form = $this->createForm(NewAvatarFormType::class);
@@ -74,16 +84,14 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if ($user->getAvatar() != "") {
-
                 $name = $user->getAvatar();
                 $pictureService->delete($name, 'avatars', 300, 300);
             }
 
             $avatar = $form->get('avatar')->getData();
             $folder = 'avatars';
-            $fichier = $pictureService->add($avatar, $folder, 300, 300);
-
-            $user->setAvatar($fichier);
+            $file = $pictureService->add($avatar, $folder, 300, 300);
+            $user->setAvatar($file);
             $entityManager->persist($user);
             $entityManager->flush();
             $this->addFlash('success', 'Votre image d\'avatar à bien été changée !');

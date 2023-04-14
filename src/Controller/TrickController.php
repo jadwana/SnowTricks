@@ -11,13 +11,13 @@ use App\Form\AddTrickFormType;
 use App\Repository\CommentsRepository;
 use App\Service\PictureService;
 use App\Repository\TricksRepository;
+use App\Service\VideoLinkService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TrickController extends AbstractController
@@ -30,84 +30,51 @@ class TrickController extends AbstractController
         ]);
     }
 
-
-
     #[Route('/ajout-figure', name: 'add_trick')]
     public function addTrick(
         Request $request,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
-        PictureService $pictureService
+        PictureService $pictureService,
+        VideoLinkService $videoLinkService
     ): Response {
 
         $this->denyAccessUnlessGranted('ROLE_USER');
-
-        //on créé une nvelle figure
         $trick = new Tricks();
-
-        //on crée le formulaire
         $form = $this->createForm(AddTrickFormType::class, $trick);
 
-        //on traite la requete du formulaire
         $form->handleRequest($request);
 
-        //on vérifie que le formulaire est soumis ET valide
         if ($form->isSubmitted() && $form->isValid()) {
-
-            //on recupère les images
+            // we recover the images
             $images = $form->get('images')->getData();
-
             foreach ($images as $image) {
-                //on définie le dossier de destination
+                // we define the destination folder
                 $folder = 'tricks';
-
-                // on appelle le service d'ajout
-                $fichier = $pictureService->add($image, $folder, 300, 300);
-
+                // we call the add service
+                $file = $pictureService->add($image, $folder, 300, 300);
                 $img = new Medias();
-                $img->setPath($fichier);
-                $img->setType('picture');
+                $img->setPath($file);
                 $img->setMain(0);
                 $trick->addMedias($img);
             }
 
-            //on récupère les videos
+            // we get the videos
             foreach ($trick->getVideos() as $video) {
-
-                $lien = explode("/", $video->getLink());
-
-                if ($lien[2] == "www.youtube.com") {
-                    $codeProv = $lien[3];
-                    $code = str_replace("watch?v=", "", $codeProv);
-                    $link = "https://www.youtube.com/embed/" . $code;
-                } else if ($lien[2] == "youtu.be") {
-                    $code = $lien[3];
-                    $link = "https://www.youtube.com/embed/" . $code;
-                } else if ($lien[2] == "dai.ly") {
-                    $code = $lien[3];
-                    $link = "https://www.dailymotion.com/embed/video/" . $code;
-                } else if ($lien[2] == "www.dailymotion.com") {
-                    $code = $lien[4];
-                    $link = "https://www.dailymotion.com/embed/video/" . $code;
-                } else {
-                    throw new \Exception('adresse incorrecte');;
-                }
+                $link = $videoLinkService->checkLink($video);
                 $video->setLink($link);
-
                 $video->setTricks($trick);
             }
 
-            // on génère le slug
+            // we generate the slug
             $slug = $slugger->slug($trick->getName());
             $trick->setSlug($slug);
 
-            //on stocke
             $entityManager->persist($trick);
             $entityManager->flush();
 
             $this->addFlash('success', 'Figure ajoutée avec succès');
 
-            //on redirige
             return $this->redirectToRoute('app_home');
         }
 
@@ -135,7 +102,7 @@ class TrickController extends AbstractController
     #[Route('/suppression-figure/{slug}', name: 'delete_trick')]
     public function delete(Tricks $trick, EntityManagerInterface $entityManager, PictureService $pictureService): Response
     {
-        //on verifie si l'utilisateur peut supprimer  avec le voter
+        // we check if the user can delete with the voter
         $this->denyAccessUnlessGranted('TRICK_DELETE', $trick);
 
         foreach ($trick->getMedias() as $media) {
@@ -170,23 +137,23 @@ class TrickController extends AbstractController
         PictureService $pictureService
     ): JsonResponse {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        // on récupère le contenu de la requete
+        // retrieve the content of the request
         $data = json_decode($request->getContent(), true);
 
-        // on vérifie le token
+        // we check the token
         if ($this->isCsrfTokenValid('delete' . $media->getId(), $data['_token'])) {
-            // le token csrf est valide
-            // on récupère le nom de l'image
+            // the csrf token is valid
+            // we get the name of the image
             $name = $media->getPath();
 
             if ($pictureService->delete($name, 'tricks', 300, 300)) {
-                // on supprime l'image de la base de donnée
+                // delete the image from the database
                 $entityManagerInterface->remove($media);
                 $entityManagerInterface->flush();
 
                 return new JsonResponse(['success' => true], 200);
             }
-            // la suppression n'a pas focntionnée
+            // deletion did not work
             return new JsonResponse(['error' => 'erreur de suppression']);
         }
 
@@ -195,92 +162,53 @@ class TrickController extends AbstractController
 
 
     #[Route('/modification-figure/{slug}', name: 'edit_trick')]
-    public function edit(Tricks $trick, Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger, PictureService $pictureService, ValidatorInterface $validator): Response
-    {
-        //on verifie si l'utilisateur peut éditer avec le voter
+    public function edit(
+        Tricks $trick,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        SluggerInterface $slugger,
+        PictureService $pictureService,
+        VideoLinkService $videoLinkService
+    ): Response {
+        // we check if the user can edit with the voter
         $this->denyAccessUnlessGranted('TRICK_EDIT', $trick);
 
-        //on crée le formulaire
         $form = $this->createForm(AddTrickFormType::class, $trick);
 
-        //on traite la requete du formulaire
         $form->handleRequest($request);
 
-        //on vérifie que le formulaire est soumis ET valide
         if ($form->isSubmitted() && $form->isValid()) {
-
-
-            //on recupère les images
             $images = $form->get('images')->getData();
-
+            // adding pictures
             foreach ($images as $image) {
-                //on définie le dossier de destination
                 $folder = 'tricks';
 
-                // on appelle le service d'ajout
-                $fichier = $pictureService->add($image, $folder, 300, 300);
+                $file = $pictureService->add($image, $folder, 300, 300);
 
                 $img = new Medias();
-                $img->setPath($fichier);
-                $img->setType('picture');
+                $img->setPath($file);
                 $img->setMain(0);
                 $trick->addMedias($img);
             }
-
-            //on ajoute les videos
+            // adding videos
             foreach ($trick->getVideos() as $video) {
-                // on valide que c'est bien une url
-                $errors = $validator->validate($video);
-                if (count($errors) > 0) {
-                    $errorsString = (string) $errors;
-                    throw new \Exception($errorsString);
 
-                    // return new Response($errorsString);
-                }
-
-                //return new Response('The video is valid! Yes!');
-
-                // on modifie le lien 
-                $lien = explode("/", $video->getLink());
-                if ($lien[3] == "embed") {
-                    $link = $video->getlink();
-                } else if ($lien[2] == "www.youtube.com") {
-                    $codeProv = $lien[3];
-                    $code = str_replace("watch?v=", "", $codeProv);
-                    $link = "https://www.youtube.com/embed/" . $code;
-                } else if ($lien[2] == "youtu.be") {
-                    $code = $lien[3];
-                    $link = "https://www.youtube.com/embed/" . $code;
-                } else if ($lien[2] == "dai.ly") {
-                    $code = $lien[3];
-                    $link = "https://www.dailymotion.com/embed/video/" . $code;
-                } else if ($lien[2] == "www.dailymotion.com") {
-                    $code = $lien[4];
-                    $link = "https://www.dailymotion.com/embed/video/" . $code;
-                } else {
-                    throw new \Exception('adresse incorrecte');
-                }
+                $link = $videoLinkService->checkLink($video);
                 $video->setLink($link);
 
                 $video->setTricks($trick);
             }
-
-
-
-            // on génère le slug
             $slug = $slugger->slug($trick->getName());
             $trick->setSlug($slug);
 
-            //on met à jour la date de modification
+            // update the modification date
             $trick->setUpdatedAt(new \DateTimeImmutable());
 
-            //on stocke
             $entityManager->persist($trick);
             $entityManager->flush();
 
             $this->addFlash('success', 'Figure modifiée avec succès');
 
-            //on redirige
             return $this->redirectToRoute('app_home');
         }
 
@@ -291,28 +219,28 @@ class TrickController extends AbstractController
     }
 
     #[Route('/{slug}', name: 'app_trick')]
-    // #[Security("is_granted('ROLE_USER')")]
-    public function index(Tricks $tricks, Request $request, EntityManagerInterface $entityManager, CommentsRepository $commentsRepository): Response
-    {
-        // on va chercher le numéro de page dans l'url
+    public function index(
+        Tricks $tricks,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        CommentsRepository $commentsRepository
+    ): Response {
+        // we will look for the page number in the url
         $page = $request->query->getInt('page', 1);
 
-        $comments = $commentsRepository->findCommentsPaginated($page, $tricks->getSlug(), 5);
+        $comments = $commentsRepository->findCommentsPaginated($page, $tricks->getSlug(), 10);
 
         $user = $this->getUser();
-        //on verifie que l'utilisateur est logué et qu'il a validé son compte pour accéder au formulaire d'ajout de commentaire
+        // we check that the user is logged in and that he has validated his account to access the form to add a comment
         if ($user && $user->getIsVerified()) {
             $comment = new Comments();
             $form = $this->createForm(CommentFormType::class, $comment);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-
                 $comment = $form->getData();
                 $comment->setAuthor($user);
-
                 $comment->setTrick($tricks);
-
                 $entityManager->persist($comment);
                 $entityManager->flush();
 
@@ -321,22 +249,17 @@ class TrickController extends AbstractController
                 return $this->redirectToRoute('app_trick', ['slug' => $tricks->getSlug()]);
             }
 
-
-            return $this->render('trick/index.html.twig', [
+            return $this->render('home/trick.html.twig', [
                 'trick' => $tricks,
                 'comments' => $comments,
                 'form' => $form->createView(),
-
             ]);
         }
-
-        return $this->render('trick/index.html.twig', [
+        return $this->render('home/trick.html.twig', [
             'trick' => $tricks,
             'comments' => $comments,
         ]);
     }
-
-
 
     #[Route('/tricks/more/{offset}', name: 'more_tricks')]
     public function loadMoreTricks(TricksRepository $tricksRepository, $offset)

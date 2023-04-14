@@ -5,7 +5,7 @@ use DateTimeImmutable;
 
 class JWTService
 {
-    // On génère le token
+    // We generate the token
 
     /**
      * Génération du JWT
@@ -25,15 +25,15 @@ class JWTService
             $payload['exp'] = $exp;
         }
 
-        // On encode en base64
+        // We encode in base64
         $base64Header = base64_encode(json_encode($header));
         $base64Payload = base64_encode(json_encode($payload));
 
-        // On "nettoie" les valeurs encodées (retrait des +, / et =)
+        // We "clean" the encoded values ​​(removal of the +, / and =)
         $base64Header = str_replace(['+', '/', '='], ['-', '_', ''], $base64Header);
         $base64Payload = str_replace(['+', '/', '='], ['-', '_', ''], $base64Payload);
 
-        // On génère la signature
+        // We generate the signature
         $secret = base64_encode($secret);
 
         $signature = hash_hmac('sha256', $base64Header . '.' . $base64Payload, $secret, true);
@@ -42,13 +42,13 @@ class JWTService
 
         $base64Signature = str_replace(['+', '/', '='], ['-', '_', ''], $base64Signature);
 
-        // On crée le token
+        // We create the token
         $jwt = $base64Header . '.' . $base64Payload . '.' . $base64Signature;
 
         return $jwt;
     }
 
-    //On vérifie que le token est valide (correctement formé)
+    // We check that the token is valid (correctly formed)
 
     public function isValid(string $token): bool
     {
@@ -58,31 +58,31 @@ class JWTService
         ) === 1;
     }
 
-    // On récupère le Payload (pour vérifier l'expiration du token)
+    // We retrieve the Payload (to check the expiration of the token)
     public function getPayload(string $token): array
     {
-        // On démonte le token
+        // We dismantle the token
         $array = explode('.', $token);
 
-        // On décode le Payload
+        // We decode the Payload
         $payload = json_decode(base64_decode($array[1]), true);
 
         return $payload;
     }
 
-    // On récupère le Header(pour vérifier la signature du token)
+    // We retrieve the Header (to verify the signature of the token)
     public function getHeader(string $token): array
     {
-        // On démonte le token
+        // We dismantle the token
         $array = explode('.', $token);
 
-        // On décode le Header
+        // We decode the Header
         $header = json_decode(base64_decode($array[0]), true);
 
         return $header;
     }
 
-    // On vérifie si le token a expiré
+    // We check if the token has expired
     public function isExpired(string $token): bool
     {
         $payload = $this->getPayload($token);
@@ -92,14 +92,14 @@ class JWTService
         return $payload['exp'] < $now->getTimestamp();
     }
 
-    // On vérifie la signature du Token
+    // We verify the signature of the Token
     public function check(string $token, string $secret)
     {
-        // On récupère le header et le payload
+        // We get the header and the payload
         $header = $this->getHeader($token);
         $payload = $this->getPayload($token);
 
-        // On régénère un token
+        // We regenerate a token
         $verifToken = $this->generate($header, $payload, $secret, 0);
 
         return $token === $verifToken;

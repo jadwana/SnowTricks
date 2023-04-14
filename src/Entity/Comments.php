@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\CreatedAtTrait;
 use App\Repository\CommentsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CommentsRepository::class)]
 class Comments
 {
+    use CreatedAtTrait;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -17,8 +20,7 @@ class Comments
     #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     private ?Tricks $trick = null;
@@ -29,7 +31,7 @@ class Comments
 
     public function __construct()
     {
-       $this->createdAt = new \DateTimeImmutable(); 
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -45,18 +47,6 @@ class Comments
     public function setContent(string $content): self
     {
         $this->content = $content;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
-    {
-        $this->createdAt = $createdAt;
 
         return $this;
     }

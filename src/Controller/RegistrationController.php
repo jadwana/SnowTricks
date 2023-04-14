@@ -82,9 +82,11 @@ class RegistrationController extends AbstractController
             );
         }
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render(
+            'registration/register.html.twig', [
             'registrationForm' => $form->createView(),
-        ]);
+            ]
+        );
     }
 
     #[Route('/verif/{token}', name: 'verify_user')]
@@ -93,7 +95,7 @@ class RegistrationController extends AbstractController
         $token, JWTService $jwt, 
         UsersRepository $usersRepository, 
         EntityManagerInterface $em
-        ): Response{
+    ): Response {
 
         // We check if the token is valid, has not expired and has not been modified
         if ($jwt->isValid($token) && !$jwt->isExpired($token) && $jwt->check($token, $this->getParameter('app.jwtsecret'))) {

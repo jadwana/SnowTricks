@@ -10,25 +10,28 @@ use Faker;
 
 class TricksFixtures extends Fixture
 {
-    public function __construct(private SluggerInterface $slugger){}
+    public function __construct(private SluggerInterface $slugger)
+    {
+    }
 
     public function load(ObjectManager $manager): void
     {
         $faker = Faker\Factory::create('fr_FR');
 
         foreach ($this->getTrickData() as [$name, $description]) {
-        $trick = new Tricks();
-        $trick->setName($name);
-        $trick->setDescription($description);
-        $trick->setSlug($this->slugger->slug($trick->getname())->lower());
-        $trick->setCreatedAt(new \DateTimeImmutable());
-        //On va chercher une référence de catégorie
-        $category = $this->getReference('cat-'. rand(1, 3));
-        $trick->setCategory($category);
+            $trick = new Tricks();
+            $trick->setName($name);
+            $trick->setDescription($description);
+            $trick->setSlug($this->slugger->slug($trick->getname())->lower());
+            $trick->setCreatedAt(new \DateTimeImmutable());
+            //On va chercher une référence de catégorie
+            $category = $this->getReference('cat-'. rand(1, 3));
+            $trick->setCategory($category);
         
         
-        $this->addReference($trick->getSlug(), $trick);
-        $manager->persist($trick);}
+            $this->addReference($trick->getSlug(), $trick);
+            $manager->persist($trick);
+        }
 
         $manager->flush();
     }

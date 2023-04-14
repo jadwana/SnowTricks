@@ -12,9 +12,11 @@ class NewAvatarFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('avatar', FileType::class, [
+            ->add(
+                'avatar', FileType::class, [
                 'label' => 'Ajouter une image d\'avatar',
-            ]);
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -32,7 +32,7 @@ class CommentsFixtures extends Fixture implements DependentFixtureInterface
             $comment->setCreatedAt(new \DateTimeImmutable());
             $user = $this->getReference('user-'. rand(1, 6));
             $comment->setAuthor($user);
-            $trick = $this->getReference($ref[rand(0,9)]);
+            $trick = $this->getReference($ref[rand(0, 9)]);
             $comment->setTrick($trick);
             $manager->persist($comment);
         }

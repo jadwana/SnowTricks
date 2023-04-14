@@ -15,13 +15,16 @@ class NewPasswordFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('oldPassword', PasswordType::class, array(
+            ->add(
+                'oldPassword', PasswordType::class, array(
 
                 'mapped' => false,
                 'label' => 'Votre ancien mot de passe'
-            ))
+                )
+            )
 
-            ->add('password', RepeatedType::class, [
+            ->add(
+                'password', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'first_options' => [
                     'attr' => [
@@ -46,20 +49,25 @@ class NewPasswordFormType extends AbstractType
 
 
                 'constraints' => [
-                    new NotBlank([
+                    new NotBlank(
+                        [
                         'message' => 'Merci de saisir un mot de passe',
-                    ]),
-                    new Length([
+                        ]
+                    ),
+                    new Length(
+                        [
                         'min' => 6,
                         'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
                         // max length allowed by Symfony for security reasons
                         'max' => 4096,
-                    ]),
+                        ]
+                    ),
 
 
                 ],
 
-            ]);
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void

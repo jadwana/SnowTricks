@@ -25,9 +25,11 @@ class TrickController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function home(TricksRepository $tricksRepository): Response
     {
-        return $this->render('home/index.html.twig', [
+        return $this->render(
+            'home/index.html.twig', [
             'tricks' => $tricksRepository->findAll()
-        ]);
+            ]
+        );
     }
 
     #[Route('/ajout-figure', name: 'add_trick')]
@@ -78,9 +80,11 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        return $this->render('home/add_trick.html.twig', [
+        return $this->render(
+            'home/add_trick.html.twig', [
             'form' => $form->createView()
-        ]);
+            ]
+        );
     }
 
     #[Route('/image-principale/{id}', name: 'main_picture')]
@@ -102,7 +106,7 @@ class TrickController extends AbstractController
     #[Route('/suppression-figure/{slug}', name: 'delete_trick')]
     public function delete(Tricks $trick, EntityManagerInterface $entityManager, PictureService $pictureService): Response
     {
-        // we check if the user can delete with the voter
+        // We check if the user can delete with the voter
         $this->denyAccessUnlessGranted('TRICK_DELETE', $trick);
 
         foreach ($trick->getMedias() as $media) {
@@ -137,23 +141,23 @@ class TrickController extends AbstractController
         PictureService $pictureService
     ): JsonResponse {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        // retrieve the content of the request
+        // Retrieve the content of the request
         $data = json_decode($request->getContent(), true);
 
-        // we check the token
+        // We check the token
         if ($this->isCsrfTokenValid('delete' . $media->getId(), $data['_token'])) {
-            // the csrf token is valid
-            // we get the name of the image
+            // The csrf token is valid
+            // We get the name of the image
             $name = $media->getPath();
 
             if ($pictureService->delete($name, 'tricks', 300, 300)) {
-                // delete the image from the database
+                // Delete the image from the database
                 $entityManagerInterface->remove($media);
                 $entityManagerInterface->flush();
 
                 return new JsonResponse(['success' => true], 200);
             }
-            // deletion did not work
+            // Deletion did not work
             return new JsonResponse(['error' => 'erreur de suppression']);
         }
 
@@ -170,7 +174,7 @@ class TrickController extends AbstractController
         PictureService $pictureService,
         VideoLinkService $videoLinkService
     ): Response {
-        // we check if the user can edit with the voter
+        // We check if the user can edit with the voter
         $this->denyAccessUnlessGranted('TRICK_EDIT', $trick);
 
         $form = $this->createForm(AddTrickFormType::class, $trick);
@@ -190,7 +194,7 @@ class TrickController extends AbstractController
                 $img->setMain(0);
                 $trick->addMedias($img);
             }
-            // adding videos
+            // Adding videos
             foreach ($trick->getVideos() as $video) {
 
                 $link = $videoLinkService->checkLink($video);
@@ -201,7 +205,7 @@ class TrickController extends AbstractController
             $slug = $slugger->slug($trick->getName());
             $trick->setSlug($slug);
 
-            // update the modification date
+            // Update the modification date
             $trick->setUpdatedAt(new \DateTimeImmutable());
 
             $entityManager->persist($trick);
@@ -212,10 +216,12 @@ class TrickController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        return $this->render('home/edit_trick.html.twig', [
+        return $this->render(
+            'home/edit_trick.html.twig', [
             'form' => $form->createView(),
             'trick' => $trick
-        ]);
+            ]
+        );
     }
 
     #[Route('/{slug}', name: 'app_trick')]
@@ -225,13 +231,13 @@ class TrickController extends AbstractController
         EntityManagerInterface $entityManager,
         CommentsRepository $commentsRepository
     ): Response {
-        // we will look for the page number in the url
+        // We will look for the page number in the url
         $page = $request->query->getInt('page', 1);
 
         $comments = $commentsRepository->findCommentsPaginated($page, $tricks->getSlug(), 10);
 
         $user = $this->getUser();
-        // we check that the user is logged in and that he has validated his account to access the form to add a comment
+        // We check that the user is logged in and that he has validated his account to access the form to add a comment
         if ($user && $user->getIsVerified()) {
             $comment = new Comments();
             $form = $this->createForm(CommentFormType::class, $comment);
@@ -249,25 +255,31 @@ class TrickController extends AbstractController
                 return $this->redirectToRoute('app_trick', ['slug' => $tricks->getSlug()]);
             }
 
-            return $this->render('home/trick.html.twig', [
+            return $this->render(
+                'home/trick.html.twig', [
                 'trick' => $tricks,
                 'comments' => $comments,
                 'form' => $form->createView(),
-            ]);
+                ]
+            );
         }
-        return $this->render('home/trick.html.twig', [
+        return $this->render(
+            'home/trick.html.twig', [
             'trick' => $tricks,
             'comments' => $comments,
-        ]);
+            ]
+        );
     }
 
     #[Route('/tricks/more/{offset}', name: 'more_tricks')]
     public function loadMoreTricks(TricksRepository $tricksRepository, $offset)
     {
-        $html = $this->renderView('home/_more_tricks.html.twig', [
+        $html = $this->renderView(
+            'home/_more_tricks.html.twig', [
             'tricks' => $tricksRepository->findAll(),
             'offset' => $offset
-        ]);
+            ]
+        );
         return new JsonResponse(['html' => $html]);
     }
 }

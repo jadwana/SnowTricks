@@ -20,13 +20,18 @@ class AddTrickFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', options: [
+            ->add(
+                'name', options: [
                 'label' => 'Nom de la figure'
-            ])
-            ->add('description', options: [
+                ]
+            )
+            ->add(
+                'description', options: [
                 'label' => 'Description de la figure'
-            ])
-            ->add('category', EntityType::class, [
+                ]
+            )
+            ->add(
+                'category', EntityType::class, [
                 'class' => Categories::class,
                 'choice_label' => 'name',
                 'label' => 'Choisissez le groupe de cette figure',
@@ -34,25 +39,31 @@ class AddTrickFormType extends AbstractType
                     return $cr->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
                 }
-            ])
-            ->add('images', FileType::class, [
+                ]
+            )
+            ->add(
+                'images', FileType::class, [
                 'label' => 'Ajouter une ou plusieurs images',
                 'multiple' => true,
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
                     new All(
-                        new Image([
+                        new Image(
+                            [
                             // 'maxWidth' => 1280,
                             // 'maxWidthMessage' => 'l\'image doit faire {{ max_width }} px de large max',
                             'mimeTypesMessage' => 'Ce fichier n\'est pas une image'
-                        ])
+                            ]
+                        )
                     )
                 ]
-            ])
+                ]
+            )
 
 
-            ->add('videos', CollectionType::class, [
+            ->add(
+                'videos', CollectionType::class, [
                 'entry_type' => VideosFormType::class,
                 'entry_options' => ['label' => false],
                 'label' => false,
@@ -60,13 +71,16 @@ class AddTrickFormType extends AbstractType
                 'allow_delete' => true
 
 
-            ]);
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Tricks::class,
-        ]);
+            ]
+        );
     }
 }

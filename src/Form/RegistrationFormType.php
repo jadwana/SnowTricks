@@ -18,20 +18,25 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('username', TextType::class, [
+            ->add(
+                'username', TextType::class, [
                 'attr' => [
                     'class' => 'form-control'
                 ],
                 'label' => 'Pseudo'
-            ])
-            ->add('email', EmailType::class, [
+                ]
+            )
+            ->add(
+                'email', EmailType::class, [
                 'attr' => [
                     'class' => 'form-control'
                 ],
                 'label' => 'Email'
-            ])
+                ]
+            )
 
-            ->add('plainPassword', PasswordType::class, [
+            ->add(
+                'plainPassword', PasswordType::class, [
                 // instead of being set onto the object directly,
                 // this is read and encoded in the controller
                 'mapped' => false,
@@ -40,29 +45,38 @@ class RegistrationFormType extends AbstractType
                     'class' => 'form-control'
                 ],
                 'constraints' => [
-                    new NotBlank([
+                    new NotBlank(
+                        [
                         'message' => 'Merci de saisir un mot de passe',
-                    ]),
-                    new Length([
+                        ]
+                    ),
+                    new Length(
+                        [
                         'min' => 6,
                         'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
                         // max length allowed by Symfony for security reasons
                         'max' => 4096,
-                    ]),
+                        ]
+                    ),
                 ],
                 'label' => 'Mot de passe'
-            ])
+                ]
+            )
 
-            ->add('avatar', FileType::class, [
+            ->add(
+                'avatar', FileType::class, [
                 'label' => 'Ajouter une image d\'avatar',
                 'required' => false,
-            ]);
+                ]
+            );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
             'data_class' => Users::class,
-        ]);
+            ]
+        );
     }
 }

@@ -23,9 +23,11 @@ class ProfileController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_USER');
         $user = $this->getUser();
         if ($user->getIsVerified()) {
-            return $this->render('profile/index.html.twig', [
+            return $this->render(
+                'profile/index.html.twig', [
                 'user' => $user
-            ]);
+                ]
+            );
         }
         $this->addFlash('danger', 'Votre compte n\'est pas encore activé');
         return $this->redirectToRoute('app_home');
@@ -64,9 +66,11 @@ class ProfileController extends AbstractController
             }
         }
 
-        return $this->render('profile/new_pass.html.twig', [
+        return $this->render(
+            'profile/new_pass.html.twig', [
             'form' => $form->createView()
-        ]);
+            ]
+        );
     }
 
     #[Route('/mon_compte/nouvel_avatar', name: 'new_avatar')]
@@ -99,8 +103,10 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
         }
 
-        return $this->render('profile/new_avatar.html.twig', [
+        return $this->render(
+            'profile/new_avatar.html.twig', [
             'form' => $form->createView()
-        ]);
+            ]
+        );
     }
 }

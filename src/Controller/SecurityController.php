@@ -26,10 +26,12 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', [
+        return $this->render(
+            'security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error
-        ]);
+            ]
+        );
     }
 
     #[Route(path: '/deconnexion', name: 'app_logout')]
@@ -81,9 +83,11 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        return $this->render('security/reset_password_request.html.twig', [
+        return $this->render(
+            'security/reset_password_request.html.twig', [
             'requestPassForm' => $form->createView()
-        ]);
+            ]
+        );
     }
 
     #[Route(path: '/oublipass/{token}', name: 'reset_password')]
@@ -122,9 +126,11 @@ class SecurityController extends AbstractController
                 return $this->redirectToRoute('app_home');
             }
 
-            return $this->render('security/reset_password.html.twig', [
+            return $this->render(
+                'security/reset_password.html.twig', [
                 'passForm' => $form->createView()
-            ]);
+                ]
+            );
         }
         $this->addFlash('danger', 'Le lien de modification n\'est plus valide');
         return $this->redirectToRoute('app_login');

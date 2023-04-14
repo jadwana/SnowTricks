@@ -28,17 +28,17 @@ class PictureService
         }
 
         switch ($picture_infos['mime']) {
-            case 'image/png':
-                $picture_source = imagecreatefrompng($picture);
-                break;
-            case 'image/jpeg':
-                $picture_source = imagecreatefromjpeg($picture);
-                break;
-            case 'image/webp':
-                $picture_source = imagecreatefromwebp($picture);
-                break;
-            default:
-                throw new \Exception('Format d\'image incorrect');
+        case 'image/png':
+            $picture_source = imagecreatefrompng($picture);
+            break;
+        case 'image/jpeg':
+            $picture_source = imagecreatefromjpeg($picture);
+            break;
+        case 'image/webp':
+            $picture_source = imagecreatefromwebp($picture);
+            break;
+        default:
+            throw new \Exception('Format d\'image incorrect');
         }
 
         // crop the image
@@ -49,21 +49,21 @@ class PictureService
         // check the orientation of the image
         // and we resize to have a square
         switch ($imageWidth <=> $imageHeight) {
-            case -1: // portrait
-                $squareSize = $imageWidth;
-                $src_x = 0;
-                $src_y = ($imageHeight - $squareSize) / 2;
-                break;
-            case 0: // square
-                $squareSize = $imageWidth;
-                $src_x = 0;
-                $src_y = 0;
-                break;
-            case 1: // landscape
-                $squareSize = $imageHeight;
-                $src_x = ($imageWidth - $squareSize) / 2;
-                $src_y = 0;
-                break;
+        case -1: // portrait
+            $squareSize = $imageWidth;
+            $src_x = 0;
+            $src_y = ($imageHeight - $squareSize) / 2;
+            break;
+        case 0: // square
+            $squareSize = $imageWidth;
+            $src_x = 0;
+            $src_y = 0;
+            break;
+        case 1: // landscape
+            $squareSize = $imageHeight;
+            $src_x = ($imageWidth - $squareSize) / 2;
+            $src_y = 0;
+            break;
         }
 
         // we create a new blank image to paste the cropped image

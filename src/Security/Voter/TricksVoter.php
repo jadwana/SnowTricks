@@ -38,20 +38,23 @@ class TricksVoter extends Voter
         // we get the user from the token
         $user = $token->getUser();
         // we verify that the account has been validated
-        if (!$user->getIsVerified()) return False;
+        if (!$user->getIsVerified()) { return false;
+        }
         // we check that the user is indeed an instance of userinterface
-        if (!$user instanceof UserInterface) return false;
+        if (!$user instanceof UserInterface) { return false;
+        }
         // we check if the user is admin
-        if (!$this->security->isGranted('ROLE_ADMIN')) return TRUE;
+        if (!$this->security->isGranted('ROLE_ADMIN')) { return true;
+        }
         // if user not admin we check the permissions
         switch ($attribute) {
-            case self::EDIT:
-                // We check if the user can edit
-                return $this->canEdit();
+        case self::EDIT:
+            // We check if the user can edit
+            return $this->canEdit();
                 break;
-            case self::DELETE:
-                // We check if the user can delete
-                return $this->canDelete();
+        case self::DELETE:
+            // We check if the user can delete
+            return $this->canDelete();
                 break;
         }
     }

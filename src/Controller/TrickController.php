@@ -48,12 +48,12 @@ class TrickController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // we recover the images
+            // We recover the images
             $images = $form->get('images')->getData();
             foreach ($images as $image) {
-                // we define the destination folder
+                // We define the destination folder
                 $folder = 'tricks';
-                // we call the add service
+                // We call the add service
                 $file = $pictureService->add($image, $folder, 300, 300);
                 $img = new Medias();
                 $img->setPath($file);
@@ -61,14 +61,14 @@ class TrickController extends AbstractController
                 $trick->addMedias($img);
             }
 
-            // we get the videos
+            // We get the videos
             foreach ($trick->getVideos() as $video) {
                 $link = $videoLinkService->checkLink($video);
                 $video->setLink($link);
                 $video->setTricks($trick);
             }
 
-            // we generate the slug
+            // We generate the slug
             $slug = $slugger->slug($trick->getName());
             $trick->setSlug($slug);
 
@@ -183,12 +183,10 @@ class TrickController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $images = $form->get('images')->getData();
-            // adding pictures
+            // Adding pictures
             foreach ($images as $image) {
                 $folder = 'tricks';
-
                 $file = $pictureService->add($image, $folder, 300, 300);
-
                 $img = new Medias();
                 $img->setPath($file);
                 $img->setMain(0);
@@ -196,10 +194,8 @@ class TrickController extends AbstractController
             }
             // Adding videos
             foreach ($trick->getVideos() as $video) {
-
                 $link = $videoLinkService->checkLink($video);
                 $video->setLink($link);
-
                 $video->setTricks($trick);
             }
             $slug = $slugger->slug($trick->getName());

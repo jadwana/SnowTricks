@@ -1,5 +1,8 @@
 # SnowTricks
 This project is a part of my training with Openclassrooms : Application's developper - PHP/Symfony.
+
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe2259ba711e48deb4fd452f35a8449c)](https://app.codacy.com/gh/jadwana/SnowTricks/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 ## Features
 
 The website includes the following pages :

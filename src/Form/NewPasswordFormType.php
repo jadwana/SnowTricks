@@ -17,7 +17,6 @@ class NewPasswordFormType extends AbstractType
         $builder
             ->add(
                 'oldPassword', PasswordType::class, array(
-
                 'mapped' => false,
                 'label' => 'Votre ancien mot de passe'
                 )
@@ -58,7 +57,7 @@ class NewPasswordFormType extends AbstractType
                         [
                         'min' => 6,
                         'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
-                        // max length allowed by Symfony for security reasons
+                        // Max length allowed by Symfony for security reasons
                         'max' => 4096,
                         ]
                     ),

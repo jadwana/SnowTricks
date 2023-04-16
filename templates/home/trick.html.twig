@@ -43,11 +43,35 @@
             {% include "_partials/_main_picture.html.twig" with { "tricks" : trick.medias, "display" : "all"} %}
             {% for video in trick.videos %}
             <div class="col">
-                <div class="ratio ratio-16x9 mt-5 ">
-                    <iframe class="shadow-sm rounded" allowfullsreen src="{{ video.link ~ '?controls=2' }} " frameborder="0"></iframe>
-                </div>
+                    <div class="row mt-5 text-center">
+                        <iframe class="shadow-sm rounded" allowfullsreen src="{{ video.link }} " frameborder="0"></iframe>
+                    </div>
+                    <div class="text-center row mt-5 mx-5">
+                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#{{ video.id }}">
+                            Afficher en plus grand
+                          </button>
+                    </div>
             </div>
+            <div id="{{ video.id }}" class="modal fade " data-bs-backdrop="static">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title px-3">Vous devez mettre en pause avant de fermer la vidéo</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button> 
+                    </div>
+                    <div class="modal-boddy">
+                        <div class="ratio ratio-16x9">
+                            <iframe allowfullscreen src="{{ video.link }}" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-outline-info" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             {% endfor %}
+            
         </div>
     </section>
     {% else %}
@@ -115,4 +139,6 @@
 {% endblock %}
 {% block javascripts %}
 <script src=" {{asset('assets/js/show.js')}}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ" crossorigin="anonymous"></script>
 {% endblock %}

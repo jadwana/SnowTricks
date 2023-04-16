@@ -31,7 +31,7 @@ class AddTrickFormType extends AbstractType
                 ]
             )
             ->add(
-                'category', EntityType::class, [
+                'category', EntityType::class,[
                 'class' => Categories::class,
                 'choice_label' => 'name',
                 'label' => 'Choisissez le groupe de cette figure',

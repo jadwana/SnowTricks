@@ -60,4 +60,4 @@ If you did not use fictive data:
 * Create a user account with sign up form
 * Activate your account by following the activation link
 
-## Congratulations, the SnowTricks project is now accessible at: localhost:8000
+### Congratulations, the SnowTricks project is now accessible at: localhost:8000

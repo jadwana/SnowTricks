@@ -41,13 +41,13 @@ class PictureService
             throw new \Exception('Format d\'image incorrect');
         }
 
-        // crop the image
-        // we get the dimensions
+        // Crop the image
+        // We get the dimensions
         $imageWidth = $picture_infos[0];
         $imageHeight = $picture_infos[1];
 
-        // check the orientation of the image
-        // and we resize to have a square
+        // Check the orientation of the image
+        // And we resize to have a square
         switch ($imageWidth <=> $imageHeight) {
         case -1: // portrait
             $squareSize = $imageWidth;
@@ -66,7 +66,7 @@ class PictureService
             break;
         }
 
-        // we create a new blank image to paste the cropped image
+        // We create a new blank image to paste the cropped image
         $resized_picture = imagecreatetruecolor($width, $height);
 
         imagecopyresampled($resized_picture, $picture_source, 0, 0, $src_x, $src_y, $width, $height, $squareSize, $squareSize);

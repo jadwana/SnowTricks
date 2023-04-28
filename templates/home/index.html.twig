@@ -8,10 +8,15 @@
     <a href="#tricks-container"><i class="fa-sharp fa-regular fa-arrow-down"></i></a>
   </div>
   <hr>
-  <div class="row text-center">
-    <a href="{{path('add_trick')}}" class="fw-bold">Ajouter une figure</a>
-  </div>
-  <hr>
+ 
+    {% if app.user and app.user.isVerified %}
+    <div class="row text-center">
+    <a href="{{path('add_trick')}}" class="fw-bold">Ajouter une figure</a> <br>
+    </div>
+    <hr>
+    {% endif %}
+ 
+ 
   <section class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4 my-3">
     {% for trick in tricks|slice(0, 5) %}
     <div class="col">

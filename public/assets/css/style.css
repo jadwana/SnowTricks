@@ -137,7 +137,6 @@ li * {
 ul *{
     list-style-type:none;
     margin-left: -0.3em;
-    /* margin-right: 3vw; */
     width: auto;
     
   }

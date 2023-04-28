@@ -4,7 +4,6 @@ namespace App\Security\Voter;
 
 use App\Entity\Tricks;
 use Symfony\Bundle\SecurityBundle\Security;
-// use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -14,6 +13,7 @@ class TricksVoter extends Voter
     // we define the constants that will be used
     const EDIT = 'TRICK_EDIT';
     const DELETE = 'TRICK_DELETE';
+    const ADD = 'TRICK_ADD';
 
     private $security;
 
@@ -24,7 +24,7 @@ class TricksVoter extends Voter
 
     protected function supports(string $attribute, $trick): bool
     {
-        if (!in_array($attribute, [self::EDIT, self::DELETE])) {
+        if (!in_array($attribute, [self::EDIT, self::DELETE, self::ADD])) {
             return false;
         }
         if (!$trick instanceof Tricks) {
@@ -38,7 +38,8 @@ class TricksVoter extends Voter
         // we get the user from the token
         $user = $token->getUser();
         // we verify that the account has been validated
-        if (!$user->getIsVerified()) { return false;
+        if (!$user->getIsVerified()) { 
+            return false;
         }
         // we check that the user is indeed an instance of userinterface
         if (!$user instanceof UserInterface) { return false;
@@ -56,6 +57,10 @@ class TricksVoter extends Voter
             // We check if the user can delete
             return $this->canDelete();
                 break;
+        case self::ADD:
+            // We check if the user can add
+             return $this->canAdd();
+                break;
         }
     }
 
@@ -64,6 +69,10 @@ class TricksVoter extends Voter
         return $this->security->isGranted('ROLE_USER');
     }
     private function canDelete()
+    {
+        return $this->security->isGranted('ROLE_USER');
+    }
+    private function canAdd()
     {
         return $this->security->isGranted('ROLE_USER');
     }

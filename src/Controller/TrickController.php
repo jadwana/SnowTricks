@@ -41,39 +41,15 @@ class TrickController extends AbstractController
         VideoLinkService $videoLinkService
     ): Response {
 
-        $this->denyAccessUnlessGranted('ROLE_USER');
+        
         $trick = new Tricks();
+        $this->denyAccessUnlessGranted('TRICK_ADD', $trick);
         $form = $this->createForm(AddTrickFormType::class, $trick);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // We recover the images
-            $images = $form->get('images')->getData();
-            foreach ($images as $image) {
-                // We define the destination folder
-                $folder = 'tricks';
-                // We call the add service
-                $file = $pictureService->add($image, $folder, 300, 300);
-                $img = new Medias();
-                $img->setPath($file);
-                $img->setMain(0);
-                $trick->addMedias($img);
-            }
-
-            // We get the videos
-            foreach ($trick->getVideos() as $video) {
-                $link = $videoLinkService->checkLink($video);
-                $video->setLink($link);
-                $video->setTricks($trick);
-            }
-
-            // We generate the slug
-            $slug = $slugger->slug($trick->getName());
-            $trick->setSlug($slug);
-
-            $entityManager->persist($trick);
-            $entityManager->flush();
+            $this->handleData($form, $pictureService, $trick, $entityManager, $slugger, $videoLinkService);
 
             $this->addFlash('success', 'Figure ajoutée avec succès');
 
@@ -90,6 +66,7 @@ class TrickController extends AbstractController
     #[Route('/image-principale/{id}', name: 'main_picture')]
     public function mainPicture(Medias $medias, EntityManagerInterface $entityManager)
     {
+        $this->denyAccessUnlessGranted('ROLE_USER');
         $params = ['slug' => $medias->getTricks()->getSlug()];
         $trickmedias = $medias->getTricks()->getMedias();
         foreach ($trickmedias as $media) {
@@ -182,30 +159,7 @@ class TrickController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $images = $form->get('images')->getData();
-            // Adding pictures
-            foreach ($images as $image) {
-                $folder = 'tricks';
-                $file = $pictureService->add($image, $folder, 300, 300);
-                $img = new Medias();
-                $img->setPath($file);
-                $img->setMain(0);
-                $trick->addMedias($img);
-            }
-            // Adding videos
-            foreach ($trick->getVideos() as $video) {
-                $link = $videoLinkService->checkLink($video);
-                $video->setLink($link);
-                $video->setTricks($trick);
-            }
-            $slug = $slugger->slug($trick->getName());
-            $trick->setSlug($slug);
-
-            // Update the modification date
-            $trick->setUpdatedAt(new \DateTimeImmutable());
-
-            $entityManager->persist($trick);
-            $entityManager->flush();
+            $this->handleData($form, $pictureService, $trick, $entityManager, $slugger, $videoLinkService);
 
             $this->addFlash('success', 'Figure modifiée avec succès');
 
@@ -277,5 +231,33 @@ class TrickController extends AbstractController
             ]
         );
         return new JsonResponse(['html' => $html]);
+    }
+
+    private function handleData ($form, $pictureService, $trick, $entityManager, $slugger, $videoLinkService) {
+        $images = $form->get('images')->getData();
+            foreach ($images as $image) {
+                // We define the destination folder
+                $folder = 'tricks';
+                // We call the add service
+                $file = $pictureService->add($image, $folder, 300, 300);
+                $img = new Medias();
+                $img->setPath($file);
+                $img->setMain(0);
+                $trick->addMedias($img);
+            }
+
+            // We get the videos
+            foreach ($trick->getVideos() as $video) {
+                $link = $videoLinkService->checkLink($video);
+                $video->setLink($link);
+                $video->setTricks($trick);
+            }
+
+            // We generate the slug
+            $slug = $slugger->slug($trick->getName());
+            $trick->setSlug($slug);
+
+            $entityManager->persist($trick);
+            $entityManager->flush();
     }
 }

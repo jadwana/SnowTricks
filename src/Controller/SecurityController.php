@@ -53,20 +53,20 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // we will look for the user by his nickname
+            // We will look for the user by his nickname
             $user = $usersRepository->findOneByUsername($form->get('username')->getData());
-            // we check if we have a user
+            // We check if we have a user
             if ($user) {
-                // we generate a reset token
+                // We generate a reset token
                 $token = $tokenGeneratorInterface->generateToken();
                 $user->setResetToken($token);
                 $entityManagerInterface->persist($user);
                 $entityManagerInterface->flush();
-                // generate a password reset link
+                // Generate a password reset link
                 $url = $this->generateUrl('reset_password', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL);
-                // we create the email data
+                // We create the email data
                 $context = compact('url', 'user');
-                // send email
+                // Send email
                 $mail->send(
                     'no-reply@snowtricks.fr',
                     $user->getEmail(),
@@ -98,7 +98,7 @@ class SecurityController extends AbstractController
         EntityManagerInterface $entityManagerInterface,
         UserPasswordHasherInterface $passwordHacher
     ): Response {
-        // we check if we have this token in the database
+        // We check if we have this token in the database
         $user = $usersRepository->findOneByResetToken($token);
 
         if ($user) {
@@ -111,7 +111,7 @@ class SecurityController extends AbstractController
                     $this->addFlash('danger', 'Le pseudo ne correspond pas, réessayer');
                     return $this->redirectToRoute('forgotten_password');
                 }
-                // we erase the token
+                // We erase the token
                 $user->setResetToken('');
                 $user->setPassWord(
                     $passwordHacher->hashPassword(

@@ -9,7 +9,7 @@ class PictureService
 {
     private $params;
 
-    // to retrieve the parameters from the services.yaml file
+    // To retrieve the parameters from the services.yaml file
     public function __construct(ParameterBagInterface $params)
     {
         $this->params = $params;
@@ -17,10 +17,10 @@ class PictureService
 
     public function add(UploadedFile $picture, ?string $folder = '', ?int $width = 250, ?int $height = 250)
     {
-        // we give a new name to the image
+        // We give a new name to the image
         $file = md5(uniqid(rand(), true)) . '.webp';
 
-        // we retrieve the information of the image
+        // We retrieve the information of the image
         $picture_infos = getimagesize($picture);
 
         if ($picture_infos === false) {
